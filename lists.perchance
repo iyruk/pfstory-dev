@@ -1,3 +1,29 @@
+$meta // this is the stuff that appears in search engines, social media preview cards, browser tab title, etc.
+  header
+    mode = minimal
+  title = 🔮 Purple's RPG Stories
+  description = Custom RPG/Story Generator made by iyruk
+pageTitle = 🔮 Purple's RPG Stories
+
+codeDebug = true // change to true if you want to see code output in dev tools
+aiDebug = false // change to true if you want to see ai prompt output in dev tools
+
+ai = {import:ai-text-plugin} // <-- for generating the story text
+commentsPlugin = {import:comments-plugin} // <-- for feedback button
+tabbedCommentsPlugin = {import:tabbed-comments-plugin-v1} // <-- for comments section at bottom of page
+fullscreenButton = {import:fullscreen-button-plugin}
+literal = {import:literal-plugin} // <-- we use this to make it so curly brackets and square brackets in the story are interpreted as literal/plain brackets, and not Perchance special curly/square block characters
+upload = {import:upload-plugin} // <-- for the share link feature
+kv = {import:kv-plugin} // <-- for story storage + auto-backups (indexeddb)
+combineEmojis = {import:combine-emojis-plugin} // simple helper for layering multiple emojis on top of one another
+prompt2 = {import:prompt2-plugin} // for "modal" popup, used for the shortcuts feature
+favicon = {import:favicon-plugin} // <-- for the icon in the browser tab
+bugReport = {import:bug-report-plugin} // for comments-plugin-based feedback button - it's a helper for getting browser debug info like browser version, localStorage size limits, etc. - stuff that's relevant to bug reports
+createTextEditor = {import:text-editor-plugin-v1} // a higher-performance version of <textarea> that also supports text styling (e.g. text within asterisks can be italicized)
+generateImage = {import:text-to-image-plugin}
+roll = {import:dice-plugin} // Added to assist in story progression
+
+
 //////////////////////////////////////////////////////////////
 // These are the instructions to the AI. You can edit them  //
 // and save your own copy of this generator. Just make sure //
