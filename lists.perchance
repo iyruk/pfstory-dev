@@ -1,3 +1,4 @@
+
 $meta // this is the stuff that appears in search engines, social media preview cards, browser tab title, etc.
   header
     mode = minimal
@@ -6,7 +7,7 @@ $meta // this is the stuff that appears in search engines, social media preview 
 pageTitle = 🔮 Purple's RPG Stories
 
 codeDebug = true // change to true if you want to see code output in dev tools
-aiDebug = false // change to true if you want to see ai prompt output in dev tools
+aiDebug = true // change to true if you want to see ai prompt output in dev tools
 
 ai = {import:ai-text-plugin} // <-- for generating the story text
 commentsPlugin = {import:comments-plugin} // <-- for feedback button
@@ -20,9 +21,9 @@ prompt2 = {import:prompt2-plugin} // for "modal" popup, used for the shortcuts f
 favicon = {import:favicon-plugin} // <-- for the icon in the browser tab
 bugReport = {import:bug-report-plugin} // for comments-plugin-based feedback button - it's a helper for getting browser debug info like browser version, localStorage size limits, etc. - stuff that's relevant to bug reports
 createTextEditor = {import:text-editor-plugin-v1} // a higher-performance version of <textarea> that also supports text styling (e.g. text within asterisks can be italicized)
+icon = {import:fa-icon-plugin}
 generateImage = {import:text-to-image-plugin}
 roll = {import:dice-plugin} // Added to assist in story progression
-
 
 //////////////////////////////////////////////////////////////
 // These are the instructions to the AI. You can edit them  //
@@ -103,7 +104,7 @@ rollDice(dice) =>
   
   if(!dice) dice = "1d20";
   localStorage.dieRoll = roll(dice);
-  diceRollBtn.textContent = "🎲 " + localStorage.dieRoll;
+  diceRollBtn.innerHTML = `${icon("dice-d20 spin-pulse","--fa-animation-duration: 0.4s; --fa-animation-iteration-count: 1;")} ` + localStorage.dieRoll;
   if(codeDebug) {console.log("diceroll: "+localStorage.dieRoll);}
 
 getDifficultyModifiers() =>
@@ -124,11 +125,15 @@ getDifficultyModifiers() =>
     return "The player's attempt has resulted in a neutral outcome.";
   }
 
-  return {
-    hard:"`DIFFICULTY_LEVEL: **VERY HARD** (permadeath; highly realistic consequences; strict aherence to reality; player CANNOT take impossible actions)`",
-    free:"`DIFFICULTY_LEVEL: **VERY EASY ** (NPCs will accept the players actions; no consequences; the player can do anything`",
-    impossible:"'DIFFICULTY_LEVEL: **IMPOSSIBLE** (Everything the player tries will fail; horrible things will happen; the player cannot succeed'"
-  }[difficultyModeEl.value] || "";
+  const modes = {
+    normal: `DIFFICULTY_LEVEL: **NORMAL** *(Normal expected responses from NPCs based on the player's actions)*`,
+    realistic: `DIFFICULTY_LEVEL: **REALISTIC** (NPCs behave realistically; authorities only intervene when the player commits crimes)`,
+    hard: `DIFFICULTY_LEVEL: **VERY HARD** (permadeath; highly realistic consequences; strict adherence to reality; player CANNOT take impossible actions)`,
+    free: `DIFFICULTY_LEVEL: **VERY EASY** (NPCs will accept the player's actions; no consequences; the player can do anything)`,
+    impossible: `DIFFICULTY_LEVEL: **IMPOSSIBLE** (Everything the player tries will fail; horrible things will happen; the player cannot succeed)`
+  };
+  
+  return modes[difficultyModeEl.value] || modes.normal;
   
   
 getExtraInstructionsForConsequencesOfAction() =>
@@ -234,7 +239,7 @@ generationEventHandlers
     diceRollBtn.disabled = true;
     regenLastBtn.disabled = true;
     deleteLastBtn.disabled = true;
-    generateBtn.textContent = "⌛ loading...";
+    generateBtn.innerHTML = `${icon("spinner spin-pulse")} loading...`;
     stopBtn.style.display = "block";
     if(storySoFarEl.value.trim() && window.continueMode !== "inline") storySoFarEl.value += "\n";
     storySoFarEl.scrollTop = 99999999;
@@ -357,6 +362,7 @@ generationEventHandlers
     }
   onFinish(data) =>
     if (aiDebug) console.log("onFinish");
+    
     if(storySoFarEl.value.length < 10000 & /^\*?\*?paragraph 1\*?\*?:\s+?/i.test(storySoFarEl.value)) {
       // for some reason the ai sometimes adds this
       storySoFarEl.value = storySoFarEl.value.replace(/^\*?\*?paragraph 1\*?\*?:\s+?/i, "");
@@ -379,10 +385,25 @@ generationEventHandlers
     diceRollBtn.disabled = false;
     regenLastBtn.disabled = false;
     deleteLastBtn.disabled = false;
-    generateBtn.textContent = "▶️ continue";
     stopBtn.style.display = "none";
     antiAntiLayoutJank(() => storySoFarEl.value = storySoFarEl.value.trim()); // remove newlines and spaces from the end of the story
     requestSaveCurrentStory({immediate:true});
+    
+    if(!window.userClickedStop){
+      if (aiDebug) console.log("generationEventHandlers : onFinish : bibleUpdate");
+      let bibleData = getNotebookDataForScope("bible");
+      bibleData.tabs.forEach(t => {
+        if (!t?.content?.length) return;
+        const cleanTitle = t.title.replace(/[<>\s\/]/g, '');
+        const bibleAutoBox = "storyBibleAutoCheckbox_"+cleanTitle
+        if (aiDebug) console.log("generationEventHandlers : onFinish : bibleUpdate : "+ bibleAutoBox);
+        if (localStorage[bibleAutoBox]) {
+          if (aiDebug) console.log("generationEventHandlers : onFinish : bibleUpdate : found : "+ localStorage.bibleAutoBox);
+          autoUpdateBibleSection({title:t.title});
+        }
+      });      
+    }
+    
     scheduleAutoNameCheck();
     updateButtonsDisplay();
     if(storySoFarEl.value.length > 1000) whatHappensNextEl.placeholder = "(Optional) What will you do next?";
@@ -1982,12 +2003,12 @@ regenerateLast() =>
   let paragraphs = storySoFarEl.value.trim().split('\n\n');
   let lastPara = paragraphs[paragraphs.length - 1];
   if(lastPara.startsWith('>')) {
-      // Do something special if last paragraph starts with ">"
     if(codeDebug) console.log("Found user action, generating paragraph instead");
     storySoFarEl.value = storySoFarEl.value.trim()+"\n"
     return continueStory({regen:true});
   }
   if(window.storyTextBeforeLastGeneration) {
+    if(codeDebug) {console.log("regenerateLast : storyTextBeforeLastGeneration :\n" + window.storyTextBeforeLastGeneration);}
     storySoFarEl.value=window.storyTextBeforeLastGeneration;
   }
   else { 
@@ -2004,15 +2025,16 @@ async continueStory(opts) =>
     localStorage.emDashesComfirmation = "1";
   }
   window.currentlyGenerating = true;
-  rollDice();
+
   window.lastGenWasContinueInline = !!opts.continueInline;
 
   // Check if first story run
   if(opts.storyBegin) {
     storyBeginBtn.textContent = "⏳ loading...";
     storyBeginBtn.disabled = true;
-    
   }
+
+  if (storyDiceCheckbox.checked && (!opts.regen || localStorage.dieRoll === "")) {rollDice();}
   
   try { injectSummariesAndComputeNextSummariesInBackgroundIfNeeded(); } catch(e) { console.error(e); }
   await new Promise(r => setTimeout(r, 5)); // just in case i accidentally make the above function async at some point - want to ensure it grabs a snapshot of the chat logs text before `temporarilyRemovedPrefixChatLogsForStreamingRenderPerformance` stuff
@@ -2261,8 +2283,9 @@ async continueStory(opts) =>
       window.includeStartWithInOutput = false;
     });
   }
-  
-  loaderEl.innerHTML = window.lastGenerationStreamObj.loadingIndicatorHtml; 
+
+  loaderEl.innerHTML = icon("cog spin");
+  // loaderEl.innerHTML = window.lastGenerationStreamObj.loadingIndicatorHtml; 
   
   let data = await window.lastGenerationStreamObj;
   
@@ -2302,9 +2325,9 @@ updateLastParagraphButtonsDisplayIfNeeded() =>
   let generateCount = Number(localStorage.generateCount); 
   if(generateCount > 2) {
     rateLastMessageCtn.style.display = "inline-block";
-    deleteLastBtn.textContent = "🗑️";
+    deleteLastBtn.innerHTML = `${icon("trash")}`;
     // deleteLastBtn.style.minWidth = "3rem";
-    regenLastBtn.textContent = "↺";
+    regenLastBtn.innerHTML = `${icon("arrows-rotate","color:var(--info);")}`;
     // regenLastBtn.style.minWidth = "3rem";
   }
 
@@ -2361,6 +2384,7 @@ generateWhatHappensNextIdeas(regen) =>
   if (codeDebug) console.log("generateWhatHappensNextIdeas");
   whatHappensNextSuggestionsCtn.style.display = "";
   generateWhatHappensNextIdeasBtn.disabled = true;
+  generateWhatHappensNextIdeasBtn.innerHTML = [icon("cog spin")];
 
   if(whatHappensNextSuggestionsCtn.innerHTML && !regen) {
     generateWhatHappensNextIdeasBtn.disabled = false;
@@ -2393,9 +2417,10 @@ generateWhatHappensNextIdeas(regen) =>
       
       whatHappensNextSuggestionsCtn.innerHTML = html;
       generateWhatHappensNextIdeasBtn.disabled = false;
+      generateWhatHappensNextIdeasBtn.innerHTML = icon("lightbulb","color:#ffe070;");
     },
   });
-  whatHappensNextSuggestionsCtn.innerHTML = pendingObj.loadingIndicatorHtml;
+  whatHappensNextSuggestionsCtn.innerHTML = [icon("cog spin")];
 
 whatHappensNextInstruction
   Please write 3 *short* one-sentence, creative ideas for what the player could do next in this text adventure. You should guess at actions that the player is likely to want to choose, based on their previous actions (prefixed by ">").
@@ -2493,7 +2518,13 @@ regenerateBibleSection() =>
   }
 
 async autoUpdateBibleSection(options) =>
+  if (!options) return; // Needs to have something to run this.
   if (codeDebug) console.log("autoUpdateBibleSection");
+  if (codeDebug) console.log("autoUpdateBibleSection : window :");
+  if (codeDebug) console.log(window.appNotebookDate);
+  let cleanTitle = options.title.replace(/[<>\s\/]/g,'');
+  window.generatingBibleSection[options.title] = true;
+  if (codeDebug) console.log("autoUpdateBibleSection : cleanTitle :" + cleanTitle);
   const storyBible = [
     "<Player Info>",
     "<Other Characters>",
@@ -2510,8 +2541,104 @@ async autoUpdateBibleSection(options) =>
     "<Lore/History>": "<update_marker_lore>",
     "<Plot Threads>": "<update_marker_mysteries>"
   };
-  
+  if (!storyBible.includes(options.title)) return;
+  if (codeDebug) console.log("autoUpdateBibleSection : options.title : " + options.title);
+  let data = getNotebookDataForScope("bible");
+  if (codeDebug) console.log("autoUpdateBibleSection : data");
+  if (codeDebug) console.log(data);
+  let tab = data.tabs.find(t => t.title === options.title);
+  if (codeDebug) console.log("autoUpdateBibleSection : tab");
+  if (codeDebug) console.log(tab);
 
+  let { isRegeneration, previousNewEvents } = options;
+  isRegeneration = tab.content !== "" ? true : false;
+  previousNewEvents = isRegeneration ? window.lastBibleGenerationData[cleanTitle] : null;
+  
+  let storyText = storySoFarEl.value;
+  let bibleMarker = bibleSectionMarkers[options.title];  
+  if (codeDebug) console.log("autoUpdateBibleSection : storyText");
+  if (codeDebug) console.log(storyText);
+  
+  if (isRegeneration && previousNewEvents !== undefined) {
+    window.newEventsForPrompt = previousNewEvents;
+  } else {
+    let placeholderIndex = storyText.lastIndexOf(bibleMarker);
+    if (codeDebug) console.log("generateBibleSection : placeholderIndex : " + placeholderIndex);
+    window.newEventsForPrompt = placeholderIndex === -1 ? storyText.trim() : storyText.substring(placeholderIndex + bibleMarker.length).trim();
+  }
+
+  window.generatingBibleSectionName = options.title;
+  let targetTextarea = "";
+  window.existingSectionContentForPrompt = tab.content.trim();
+
+    if (!isRegeneration) {
+      window.lastBibleGenerationData[options.title] = {
+        newEvents: window.newEventsForPrompt,
+        existingContent: window.existingSectionContentForPrompt
+      };
+      
+      let cleanedStoryText = storySoFarEl.value.replace(new RegExp(`\\n*\\s*${bibleMarker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n*`, 'g'), "\n\n").trim();
+      if (codeDebug) console.log("generateBibleSection : cleanedStoryText : " + cleanedStoryText);
+      storySoFarEl.value = (cleanedStoryText ? cleanedStoryText + "\n\n" : "") + bibleMarker;
+      localStorage.storySoFar = storySoFarEl.value;
+    }
+  closeNotepadPanel();
+  Object.assign(openNotepadBtn, {
+    disabled: true,
+    innerHTML: `${icon("spinner spin-pulse")} Notepad`,
+    title: "Bible Updating..."
+  });
+
+  let originalText = tab.content;
+  // let originalPlaceholder = tab.placeholder;
+  // targetTextarea.value = "";
+  // targetTextarea.placeholder = "⏳ Loading... Just a sec.";
+
+  window.currentAutoBibleGeneration[options.title] = ai({
+    instruction: bibleAutoUpdatePrompt.evaluateItem,
+    onChunk: (data) => {
+      if (!data.isFromStartWith) {
+        targetTextarea += data.textChunk;
+      }
+    }
+  });
+
+    let bibleData;
+  try {
+    window.generatingBibleSection[options.title] = true;
+    if (codeDebug) console.log("autoUpdateBibleSection : try : " + window.generatingBibleSection[options.title]);
+    
+    bibleData = await window.currentAutoBibleGeneration[options.title]; 
+    
+    if (bibleData.stopReason === 'error' || bibleData.stopReason === 'user') {
+      if (codeDebug) console.log("autoUpdateBibleSection : generateBibleSection : ifstop");
+    } else {
+      if (codeDebug) console.log("autoUpdateBibleSection : try : ifstop : else");
+      let finalValue = targetTextarea.trim();
+      targetTextarea = finalValue;
+      tab.content = finalValue;
+    }
+  } catch (e) {
+    console.error("AI call failed:", e);
+  } finally {    
+    if (codeDebug) console.log("autoUpdateBibleSection : finally");
+    setNotebookDataForScope("bible", data);
+    Object.assign(openNotepadBtn, {
+      disabled: false,
+      innerHTML: `${icon("table-list")} Notepad`,
+      title: ""
+    });
+    
+    if (bibleData && bibleData.stopReason !== 'error' && bibleData.stopReason !== 'user') {
+      storyBibleRegenBtn.style.display = 'inline-block';
+    }
+    
+    window.generatingBibleSection[options.title] = false;
+    window.currentAutoBibleGeneration[options.title] = null;
+    window.generatingBibleSectionName = null;
+    window.newEventsForPrompt = null;
+    window.existingSectionContentForPrompt = null;
+  }
   
 async generateBibleSection(options) =>
   if (codeDebug) console.log("generateBibleSection");  
@@ -2538,19 +2665,19 @@ async generateBibleSection(options) =>
     "<Plot Threads>": "<update_marker_mysteries>"
   };
   if (!storyBible.includes(bibleSection)) return;
-  if (codeDebug) console.log("bibleSection: " + bibleSection);
+  if (codeDebug) console.log("generateBibleSection : bibleSection : " + bibleSection);
 
   const { isRegeneration, previousNewEvents } = options;
   
   let storyText = storySoFarEl.value;
   let bibleMarker = bibleSectionMarkers[bibleSection];
-  if (codeDebug) console.log("bible marker: " + bibleMarker);
+  if (codeDebug) console.log("generateBibleSection : bibleMarker : " + bibleMarker);
 
   if (isRegeneration && previousNewEvents !== undefined) {
     window.newEventsForPrompt = previousNewEvents;
   } else {
     let placeholderIndex = storyText.lastIndexOf(bibleMarker);
-    if (codeDebug) console.log("placeholderIndex: " + placeholderIndex);
+    if (codeDebug) console.log("generateBibleSection : placeholderIndex : " + placeholderIndex);
     window.newEventsForPrompt = placeholderIndex === -1 ? storyText.trim() : storyText.substring(placeholderIndex + bibleMarker.length).trim();
   }
 
@@ -2562,7 +2689,6 @@ async generateBibleSection(options) =>
   //   return;
   // }
   
-  window.generatingBibleSectionId = bibleSection;
   window.generatingBibleSectionName = bibleSection;
   let targetTextarea = window.notepadEditorEl;
   window.existingSectionContentForPrompt = window.notepadEditorEl.value.trim();
@@ -2573,13 +2699,13 @@ async generateBibleSection(options) =>
     };
     
     let cleanedStoryText = storySoFarEl.value.replace(new RegExp(`\\n*\\s*${bibleMarker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n*`, 'g'), "\n\n").trim();
-    if (codeDebug) console.log("generateBibleSection : " + cleanedStoryText);
+    if (codeDebug) console.log("generateBibleSection : cleanedStoryText : " + cleanedStoryText);
     storySoFarEl.value = (cleanedStoryText ? cleanedStoryText + "\n\n" : "") + bibleMarker;
     localStorage.storySoFar = storySoFarEl.value;
   }
 
-  storyBibleGenerateBtn.disabled = true;
-  storyBibleRegenBtn.disabled = true;
+  storyBibleGenerateBtn.hidden = true;
+  storyBibleRegenBtn.hidden = true;
   storyBibleDeleteBtn.disabled = true;
   storyBibleStopBtn.hidden = false;
   storyBibleLoader.hidden = false;
@@ -2603,7 +2729,10 @@ async generateBibleSection(options) =>
     
   let bibleData;
   try {
-    if (codeDebug) console.log("trying ai?");
+    
+    window.generatingBibleSection[bibleSection] = true;
+    if (codeDebug) console.log("generateBibleSection : try : " + window.generatingBibleSection[bibleSection]);
+    
     bibleData = await window.currentBibleGeneration; 
     
     if (bibleData.stopReason === 'error' || bibleData.stopReason === 'user') {
@@ -2622,237 +2751,23 @@ async generateBibleSection(options) =>
   } finally {
     targetTextarea.placeholder = originalPlaceholder;
     saveNotepadEditorToActiveTab();
-    storyBibleGenerateBtn.disabled = false;
+    storyBibleRegenBtn.hidden = (window.notepadEditorEl.value.trim() === "");
+    storyBibleRegenBtn.disabled = false;
+    storyBibleDeleteBtn.hidden = (window.notepadEditorEl.value.trim() === "");
     storyBibleDeleteBtn.disabled = false;
+    storyBibleGenerateBtn.hidden = (window.notepadEditorEl.value.trim() !== "");
+    storyBibleGenerateBtn.disabled = false;
     storyBibleStopBtn.hidden = true;
     storyBibleLoader.hidden = true;
     closeNotepadBtn.disabled = false;
     notepadScopeSelectEl.disabled = false;
     notepadTabsSelectEl.disabled = false;
-    
-    if (bibleData && bibleData.stopReason !== 'error' && bibleData.stopReason !== 'user') {
-      storyBibleRegenBtn.style.display = 'inline-block';
-    }   
-    storyBibleGenerateBtn.hidden = false;
-    storyBibleRegenBtn.disabled = false;
     window.generatingBibleSection[bibleSection] = false;
     window.currentBibleGeneration = null;
-    window.generatingBibleSectionId = null;
     window.generatingBibleSectionName = null;
     window.newEventsForPrompt = null;
     window.existingSectionContentForPrompt = null;
   }
-
-// async currentTrackedInfoManualEditHandler() =>
-//   localStorage.currentTrackedInfo = currentTrackedInfoEl.value;
-//   window.manualCurrentTrackedInfoEditsSinceLastCheckpoint++;
-//   if(window.manualCurrentTrackedInfoEditsSinceLastCheckpoint > 10) {
-//     updateTrackedInfoUndoBtn.hidden = true;
-//   }
-//   update(updateTrackedInfoBtn);
-
-// async generateInitialTrackedInfo() =>
-//   let instruction = prompt("(Optional) Provide an instruction for the template you'd like to generate, 𝗼𝗿 𝗷𝘂𝘀𝘁 𝗰𝗹𝗶𝗰𝗸 𝗢𝗞.")
-//   if(instruction === null) return; // they clicked cancel
-//   // localStorage.lastInstruction = instruction;
-//   // lastInstructionEl.value = instruction;
-//   let originalPlaceholder = currentTrackedInfoEl.placeholder;
-//   currentTrackedInfoEl.placeholder = "⏳ Loading... Just a sec.";
-//   updateTrackedInfoBtn.disabled = true;
-//   updateTrackedInfoStopBtn.hidden = false;
-//   currentTrackedInfoEl.value = "";
-//   let prePrefix = `<tracked_info>\n`;
-//   window.processedStorySoFarText = getPreprocessedStoryText();
-//   let promise = ai({
-//     instruction: `
-//     ${sharedInstructionPrefix.evaluateItem}
-//     TASK: Your task is to generate a simple plaintext RPG info tracking sheet with some starting values${storySoFarEl.value.trim() ? " Based on what has happened so far" : ""} for tracking an RPG game's world/character state. Base your response on this instruction: ${instruction || "Simple tracker for player's level, hitpoints, mana, xp, inventory, location, etc."}
-//     </instructions>
-    
-//     BASIC EXAMPLE (you can change/add/remove things from this as necessary - this is just an example):
-//     <tracked_info>
-//     # Player:
-//     Level: 1
-//     Hitpoints: 100/100
-//     Mana: 10/10
-//     XP: 0/300
-//     Gold: 2
-//     Location: Adventurer's Guild, Arandale (Eastern Province of Daeanchen)
-//     Quest: None
-//     Inventory:
-//     - handkerchief
-//     - rusty dagger
-//     </tracked_info>
-//     `.trim(),
-//     startWith: `${prePrefix}# Player:`,
-//     stopSequences: ["</track"],
-//     onChunk: (data) => {
-//       currentTrackedInfoEl.value += data.textChunk;
-//       currentTrackedInfoEl.value = currentTrackedInfoEl.value.replace(prePrefix, "");
-//     },
-//   });
-//   updateTrackedInfoStopBtn.onclick = function() {
-//     promise.stop();
-//   };
-//   await promise;
-//   currentTrackedInfoEl.value = currentTrackedInfoEl.value.replace(/<\/track$/, "").trim();
-//   localStorage.currentTrackedInfo = currentTrackedInfoEl.value;
-//   currentTrackedInfoEl.placeholder = originalPlaceholder;
-//   updateTrackedInfoBtn.disabled = false;
-//   updateTrackedInfoStopBtn.hidden = true;
-//   storySoFarEl.value = storySoFarEl.value.trim().replace(/\n+<tracked_info_placeholder>\n*/g, "\n\n").trim() + "\n\n<tracked_info_placeholder>";
-//   localStorage.storySoFar = storySoFarEl.value;
-//   update(updateTrackedInfoBtn);
-
-// async updateTrackedInfo() =>
-//   if(!infoTrackingBtn.dataset.enabled) throw new Error("It shouldn't be possible to update tracked info if it's disabled.");
-  
-//   if(localStorage.knowsTrackedInfoAutoUpdateIsInaccurate !== "1") {
-//     if(!confirm(`Note: The AI often makes mistakes when trying to auto-update the tracked info. The last info synced is backed up to the Notepad`)) return;
-//     localStorage.knowsTrackedInfoAutoUpdateIsInaccurate = "1";
-//   }
-  
-//   let numMarkers = storySoFarEl.value.split(/\n+<tracked_info_placeholder>\n+/).length - 1;
-//   if(numMarkers > 1) { // should only be one, so we keep the last one:
-//     let i = -1;
-//     storySoFarEl.value = storySoFarEl.value.replace(/\n+<tracked_info_placeholder>\n+/, function(m) {
-//       i++;
-//       return i === numMarkers-1 ? m : "\n\n";
-//     });
-//   }
-//   if(numMarkers === 0) {
-//     storySoFarEl.value = storySoFarEl.value.trim().replace(/\n+<tracked_info_placeholder>\n*/g, "\n\n").trim() + "\n\n<tracked_info_placeholder>";
-//   }
-  
-//   let originalPlaceholder = currentTrackedInfoEl.placeholder;
-//   currentTrackedInfoEl.placeholder = "⏳ Loading... Just a sec.";
-//   updateTrackedInfoBtn.disabled = true;
-//   updateTrackedInfoStopBtn.hidden = false;
-  
-//   let error;
-  
-//   let originalTrackedInfoText = currentTrackedInfoEl.value;
-//   let trackerNote = setActiveNotepadTabByName("Info Tracker Backup");
-//   if (!trackerNote) {addNotepadTab("Info Tracker Backup")} else {setActiveNotepadTabByName("Info Tracker Backup")};
-//   openNotepadPanel();
-//   window.notepadEditorEl.value = originalTrackedInfoText;
-//   if (codeDebug) console.log("Update Notepad with old tracker notes, in case the update breaks");
-//   try {
-//     let prePrefix = `<tracked_info:updated>\n`;
-//     let originalTextPrefix = originalTrackedInfoText.split(/[:=]/)[0];
-//     if(originalTextPrefix.includes("\n") || originalTextPrefix.length > 50) originalTextPrefix = "";
-
-//     window.processedStorySoFarText = getPreprocessedStoryText();
-//     let subsequentEventsText = window.processedStorySoFarText.split("</tracked_info>")[1].trim();
-//     subsequentEventsText = subsequentEventsText.replace(/ \(previous events\)/g, ""); // so it doesn't get confused by the hierarchical summary stuff, and think "previous" events should be excluded
-
-//     currentTrackedInfoEl.value = ""; // must come AFTER the call to getPreprocessedStoryText() above, since it is used in `getPreprocessedStoryText`
-
-//     // This commented-out old approach tried to rely on the prefix cache of the full story text, but it was confusing the model.
-//     // BUT: I'm not sure if the new approach will suffer from not having enough context on the stuff mentioned in the preceding events (e.g. character nicknames, and stuff like that)
-//     // EDIT: And also, the model still stuggles with the new approach anyway...
-//     // let promise = ai({
-//     //   instruction: `
-//     //   ${sharedInstructionPrefix.evaluateItem}
-//     //   TASK: Your task is to write an updated version of the tracked info, based on anything that has happened in the story AFTER the <tracked_info> block in the story you see above. Look at things that happened AFTER </tracked_info> and write the new, updated tracked info based on the things that have happened since then. Update the *existing* sections/properties (no new sections, no extra stuff).
-//     //   </instructions>
-//     //   `.trim(),
-//     //   startWith: `${prePrefix}${originalTextPrefix}`,
-//     //   stopSequences: ["</track"],
-//     //   onChunk: (data) => {
-//     //     currentTrackedInfoEl.value += data.textChunk;
-//     //     currentTrackedInfoEl.value = currentTrackedInfoEl.value.replace(prePrefix, "");
-//     //   },
-//     // });
-    
-//     let generatedText = "";
-//     let trackedInfoText = "";
-//     let trackedInfoHasStarted = false;
-//     let promise = ai({
-//       instruction: `
-//       Below are some events that have happened since the tracked_info was last updated. Your task is to:
-//       1. Write a concise paragraph-by-paragraph dot-point summary of the events_since_last_tracked_info_update with a focus on events that could affect the tracked_info properties.
-//         - IMPORTANT: Within dot-point your summary, whenever you notice a tracked_info change, explicitly write the change in parentheses e.g. "(X changes from Y to Z)"
-//       2. Use the dot-point summary that you wrote to update the tracked_info data. Write your summary, and then after that, write the updated tracked info enclosed in tags like this: <tracked_info:updated>...</tracked_info:updated>
-            
-//       ---
-      
-//       <events_since_last_tracked_info_update>
-//       ${subsequentEventsText}
-//       </events_since_last_tracked_info_update>
-
-//       ---
-      
-//       <tracked_info:original>
-//       ${originalTrackedInfoText}
-//       </tracked_info:original>
-      
-//       ---
-      
-//       Reminders:
-//       - If none of the tracked_info properties have changed, then just respond with the exact same tracked info text.
-//       - Your task is to write an updated version of the tracked info, based on your concise paragraph-by-paragraph dot-point summary of the events_since_last_tracked_info_update.
-//       - Update the *existing* sections/properties (no new sections, just update existing properties/lists, and only if needed).
-//       - Start your response with the dot-point event summary, and then after that, write the updated tracked info enclosed in tags like this: <tracked_info:updated>...</tracked_info:updated>
-//       - IMPORTANT: Within dot-point your summary, whenever you notice a tracked_info change, explicitly write the change in parentheses e.g. "(X changes from Y to Z)" or "(No change)". You must repeat this particular instruction as part of the first line of your response, so you don't forget it.
-//       - The parentheses stuff is for the summary dot-point items (NOT for text within the tracked_info tags).
-//       `.trim(),
-//       startWith: `Summary of events, with required tracked info updates appended in parentheses, in the form "(X changes from Y to Z)" or "(No change)":\n-`, // `${prePrefix}${originalTextPrefix}`,
-//       stopSequences: ["</track"],
-//       onChunk: (data) => {
-//         if(trackedInfoHasStarted) {
-//           currentTrackedInfoEl.value += data.textChunk;
-//         }
-//         generatedText += data.textChunk;
-//         if(!trackedInfoHasStarted && generatedText.includes(prePrefix)) {
-//           currentTrackedInfoEl.value = generatedText.split(prePrefix)[1];
-//           trackedInfoHasStarted = true;
-//         }
-//       },
-//     });
-//     updateTrackedInfoStopBtn.onclick = function() {
-//       promise.stop();
-//     };
-//     let result = await promise;
-//     if(result.stopReason === "error" || result.stopReason === "user") { // "user" means .stop() was called - i.e. stop button clicked
-//       currentTrackedInfoEl.value = originalTrackedInfoText;
-//     } else {
-//       let newTrackedInfoText = currentTrackedInfoEl.value;
-//       newTrackedInfoText = newTrackedInfoText.replace(/\n?<\/track$/, "").trim();
-//       newTrackedInfoText = newTrackedInfoText.split("\nUpdated Tracked Info:")[0];
-//       newTrackedInfoText = newTrackedInfoText.replace(/ \(.+? changes from.+?\)(\n|$)/g, "\n");
-//       newTrackedInfoText = newTrackedInfoText.replace(/ \(.*?(found|spent).+?\)(\n|$)/g, "\n");
-//       newTrackedInfoText = newTrackedInfoText.replace(/ \((chang(ed|s|)|updat(ed|s|)|increment(ed|s|)|decrement(ed|s|)) (from|by|to).*?\)(\n|$)/gi, "\n");
-//       newTrackedInfoText = newTrackedInfoText.replace(/ \(new item\)(\n|$)/gi, "\n");
-//       newTrackedInfoText = newTrackedInfoText.replace(/ \(no changes?\)(\n|$)/gi, "\n");
-//       newTrackedInfoText = newTrackedInfoText.replace(/ \(1.*? used\)(\n|$)/gi, "\n");
-//       currentTrackedInfoEl.value = newTrackedInfoText.trim();
-//       localStorage.currentTrackedInfo = newTrackedInfoText;
-//       let storySoFarBeforeMovingTrackedInfoPlaceholder = storySoFarEl.value;
-//       storySoFarEl.value = storySoFarEl.value.trim().replace(/\n+<tracked_info_placeholder>\n*/g, "\n\n").trim() + "\n\n<tracked_info_placeholder>";
-//       localStorage.storySoFar = storySoFarEl.value;
-//       updateTrackedInfoUndoBtn.hidden = false;
-//       updateTrackedInfoUndoBtn.onclick = function() {
-//         if(updateTrackedInfoUndoBtn.hidden) return; // just for safety in case of something weird like programmatic click or whatever
-//         updateTrackedInfoUndoBtn.hidden = true;
-//         currentTrackedInfoEl.value = originalTrackedInfoText;
-//         localStorage.currentTrackedInfo = currentTrackedInfoEl.value;
-//         storySoFarEl.value = storySoFarBeforeMovingTrackedInfoPlaceholder; // NOTE: this is safe because we hide the undo button when the story text is edited at all (e.g. by manually typing, or generating, etc.)
-//         localStorage.storySoFar = storySoFarEl.value;
-//       };
-//       window.manualCurrentTrackedInfoEditsSinceLastCheckpoint = 0;
-//     }
-//   } catch(e) {
-//     console.error(e);
-//     error = e;
-//     currentTrackedInfoEl.value = originalTrackedInfoText;
-//   } finally {
-//     currentTrackedInfoEl.placeholder = originalPlaceholder;
-//     updateTrackedInfoBtn.disabled = false;
-//     updateTrackedInfoStopBtn.hidden = true;
-//     update(updateTrackedInfoBtn);
-//   }
-//   if(error) throw error; // so it shows up in the UI for people to report
 
 loadChatDataIntoInputAreas(data) =>  
   if (codeDebug) console.log("loadChatDataIntoInputAreas : START");
@@ -2934,6 +2849,7 @@ loadChatDataIntoInputAreas(data) =>
   localStorage.storyBibleAutoCheckbox_PlotThreads = data.storyBibleAuto_PlotThreads || "";
   storyDiceCheckbox.checked = data.storyDiceEnabled || "";
   toggleSendStoryInputCheckbox.checked = data.toggleSendStoryInput || "";
+  diceRollBtn.innerHTML = `${icon("dice-d20")}` + localStorage.dieRoll || `${icon("dice-d20")}`;
   updateInfoTrackingDisplay(false);
   
   updateButtonsDisplay();
@@ -3685,7 +3601,6 @@ async getStoryStats() =>
     mb: totalMB
   };
 
-
 //////////////////////////////////////////////////////
 // Background + music + theme customization helpers //
 //////////////////////////////////////////////////////
@@ -3841,6 +3756,7 @@ loadNotepadTabContent(tabId) =>
     if (codeDebug) console.log("loadNotepadTabContent : storyBibleCheckboxKey : " + storyBibleCheckboxKey);
     storyBibleAutoUpdateCheckBox.checked = localStorage[storyBibleCheckboxKey] || "";
     storyBibleRegenBtn.hidden = (window.notepadEditorEl.value.trim() === "");
+    storyBibleDeleteBtn.hidden = (window.notepadEditorEl.value.trim() === "");
     storyBibleGenerateBtn.hidden = (window.notepadEditorEl.value.trim() !== "");
     window.notepadLoadingContent = false;
   }
@@ -4068,8 +3984,8 @@ setupNotepadResizer() =>
     notepadResizeHandle.setPointerCapture(e.pointerId);
     function onMove(ev) {
       let delta = startX - ev.clientX;
-      let nextWidth = Math.max(220, startWidth + delta);
-      nextWidth = Math.min(nextWidth, Math.max(260, window.innerWidth - 160));
+      let nextWidth = Math.max(310, startWidth + delta);
+      nextWidth = Math.min(nextWidth, Math.max(310, window.innerWidth - 160));
       document.documentElement.style.setProperty("--notepad-width", `${Math.round(nextWidth)}px`);
     }
     function onUp(ev) {
@@ -5551,19 +5467,20 @@ bibleAutoUpdatePrompt
   5. Use STATUS: to mark other characters inactive instead of deleting them.
   6. If nothing changes, return the EXISTING CONTENT exactly as it is.
   7. Be concise. Separate key details with semicolons.
-  8. When listing relationships, include only: NAME (relationship). - Do not describe the other character.
-  9. Refer to the player as their name if given, otherwise "Main Character".
+  8. Short sections only, no long descriptions or details.
+  9. When listing relationships, include only: NAME (relationship). - Do not describe the other character.
+  10. Refer to the player as their name if given, otherwise "Main Character".
     - If multiple are specified in the overview, use "Main Characters" and structure them separately under Player Info & Inventory.
-  10. Use the reference format as a guidelinel; you may add new sections or reorganize if needed.
-  11. Do not place Main Character inside Other Characters.
-  12. Only Main Character should in in Player Info
-  13. Do not mix sections.
+  11. Use the reference format as a guidelinel; you may add new sections or reorganize if needed.
+  12. Do not place Main Character inside Other Characters.
+  13. Only Main Character should in in Player Info
+  14. Do not mix sections.
     - Mysteries do not go in Lore & Factions.
     - Factions do not go in Mysteries & Plot Threads.
-  14. Do not infer or invent information.
+  15. Do not infer or invent information.
     - Only include facts explicitly stated in the NEW STORY EVENTS.
     - If a field is requested but you have no data but "Not discovered"
-  15. You MUST populate additional data as new entries or lines depending on what's needed: [bibleSectionAdditionaInfo()]
+  16. You MUST populate additional data as new entries or lines depending on what's needed: [bibleSectionAdditionaInfo()]
 
   GUIDELINES:
 
@@ -5739,7 +5656,6 @@ initStoryObserver() =>
 runObserver
   [setTimeout(() => initStoryObserver(), 1000)]
 
-
 // Writing Style & Genre Lists
 genreInstructions
   default
@@ -5760,7 +5676,7 @@ genreInstructions
   contemporary
     - **Genre: Contemporary.** Set the story in the present day. The conflicts and themes should be relatable to a modern audience. Focus on realistic characters and situations.
   slice_of_life
-    - **Genre: Slice of Life.** Focus on the small, everyday moments in characters' lives. The plot is often minimal, with an emphasis on character development and realism. The tone is often warm and nostalgic. Do not include major conflicts or plot twists, unless the user specifies one, even then, keep it minor and realistic.
+    - **Genre: Slice of Life.** Focus on small, everyday moments in characters' lives. The narrative should emphasize ordinary experiences, subtle emotions, and realistic interactions. The story must remain grounded in normal daily life. Do NOT introduce major conflicts, conspiracies, villains, mysteries, or large-scale explanations. If something unusual or inconvenient occurs, treat it as a minor personal problem rather than a larger plot. Characters should react in practical, mundane ways instead of investigating or uncovering hidden causes.
   romance
     - **Genre: Romance.** The central plot must revolve around the development of a romantic relationship between characters. Ensure emotional depth and a satisfying romantic arc. 
   self_help
@@ -5821,7 +5737,6 @@ styleInstructions
     - **Writing Style: Modernist.** Focus on the inner, subjective experience of the characters. Experiment with form, fragmented narratives, and non-linear timelines. Often includes themes of alienation and disillusionment.
   existing
     - **Writing Style: Existing.** Use the pre-exisitng StorySoFar to learn the writing style and continue it's formatting.
-
 
 commentChannels
   general
