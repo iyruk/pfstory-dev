@@ -35,7 +35,7 @@ roll = {import:dice-plugin} // Added to assist in story progression
 // Note that any line with double slash before it is ignored. You can use them for notes (like the one you're reading right now), or for temporarily removing some lines when testing stuff (like you see with some lines below).
 
 // Note: see `responseStyleEl` in the HTML panel for the editor's notes / writing style
-// shortWritingInstruction = [responseStyleEl.value.replace("@@@custom", responseStyleCustomInputEl.value).trim()]
+// shortWritingInstruction = [responseStyleEl.value.replace("@@@custom", storyWritingStyleResponseInputEl.value).trim()]
 startWithPrefix = [`# Direct Consequences of NEXT_ACTION ("1 paragraph"):`]
 storyPerspective = [document.getElementById('storyPerspectiveSelectEl').value || "second"]
 bibleOptionalPrompt = ""
@@ -90,13 +90,29 @@ getStoryPrefixData(source) =>
     lines.push(`Make sure to weave in any elements the user adds in 'OVERVIEW'.`);
   }
 
-  if(style !== "default") {let styleData = styleInstructions[style]; lines.push(`Do not use a local/learned writing style based on the 'STORY SO FAR', instead, follow this style: ${styleData}.`);}
+  if(style !== "default") {
+    let styleData = ""
+    if (style === "custom") {
+      console.log("found custom" + storyWritingStyleCustomInputEl.value);
+      styleData = storyWritingStyleCustomInputEl.value;
+    } else {
+      console.log("did not found custom");
+      styleData = styleInstructions[style];
+    }
+    console.log("styleData: " + styleData);
+    lines.push(`Do not use a local/learned writing style based on the 'STORY SO FAR', instead, follow this style: ${styleData}.`)
+  }
 
-  if (source !== "inline" && source !== "inlineCompletionText") {
-    lines.push(`# Direct Consequences of NEXT_ACTION (${paragraphs} Paragraph(s) Maximum):`);
+  if(style !== "custom") {
+    if (source !== "inline" && source !== "inlineCompletionText") {
+      lines.push(`# Direct Consequences of NEXT_ACTION (${paragraphs} Paragraph(s) Maximum):`);
+    } else {
+      lines.push(`# Direct Consequences of NEXT_ACTION (1 paragraph):`);
+    };
   } else {
-    lines.push(`# Direct Consequences of NEXT_ACTION (1 paragraph):`);
-  };
+    lines.push(`# Direct Consequences of NEXT_ACTION (${storyWritingStyleResponseInputEl.value})):`)
+  }
+
   if (codeDebug) console.log("getStoryPrefixData:\n"+lines.join("\n").trim());
   return lines.join("\n").trim() || "";
 
@@ -636,6 +652,7 @@ normalizeStoryData(data) =>
     storyBibleAuto_PlotThreads: !!data.storyBibleAuto_PlotThreads,
     storyDiceEnabled: !!data.storyDiceEnabled,
     toggleSendStoryInput: !!data.toggleSendStoryInput,
+    storyWritingStyleResponseInput: (data.storyWritingStyleResponseInput ?? ""),
     storyWritingStyleCustomInput: (data.storyWritingStyleCustomInput ?? ""),
     storyPerspective: (data.storyPerspective ?? ""),
     gameMode: (data.gameMode ?? ""),
@@ -728,8 +745,8 @@ getCurrentStoryDataForStorage() =>
     whatHappensNext: whatHappensNextEl?.value ?? "",
     storyPerspective: storyPerspectiveSelectEl.value,
     // responseStyle: responseStyleEl.value,
-    // responseStyleCustomInput: responseStyleCustomInputEl.value,
-    // storyWritingStyleCustomInput: storyWritingStyleCustomInputEl.value,
+    storyWritingStyleResponseInput: storyWritingStyleResponseInputEl.value,
+    storyWritingStyleCustomInput: storyWritingStyleCustomInputEl.value,
     paragraphLimit: getParagraphLimitFromSelect(),
     backgroundVisual: window.currentBackgroundVisual || "",
     backgroundMusic: window.currentBackgroundMusic || "",
@@ -2816,15 +2833,15 @@ loadChatDataIntoInputAreas(data) =>
   //   let isValid = [...responseStyleEl.querySelectorAll("option")].filter(el => el.value===data.responseStyle).length > 0;
   //   if(isValid) responseStyle = data.responseStyle;
   // }
-  // responseStyleEl.value = responseStyle;
-  // customResponseStyleCtn.hidden = responseStyle !== "@@@custom";
-  // responseStyleCustomInputEl.value = data.responseStyleCustomInput || "";
-  // storyWritingStyleCustomInputEl.value = data.storyWritingStyleCustomInput || "";
+  // responseStyleEl.value = responseStyle;  
+  storyWritingStyleSelectEl.value = data.storyWritingStyle || "default",
+  storyCustomWritingStyleCtn.hidden = data.storyWritingStyle !== "custom";
+  storyWritingStyleResponseInputEl.value = data.storyWritingStyleResponseInput || "";
+  storyWritingStyleCustomInputEl.value = data.storyWritingStyleCustomInput || "";
 
   storyPerspectiveSelectEl.value = data.storyPerspective || "second";
   difficultyModeEl.value = data.difficultyMode || "";
   storyGameModeSelectEl.value = data.gameMode || "";
-  storyWritingStyleSelectEl.value = data.storyWritingStyle || "default",
   storyWritingLengthEl.value = data.storyWritingLength || "1",
   storyGenreSelectEl.value = data.storyGenreSelect || "default",
   storySubGenreSelectEl.value = data.storySubGenreSelect || "default",
@@ -3144,8 +3161,8 @@ getCurrentStoryData() =>
     appNotebook: normalizeNotebookData(window.appNotebookData),
     sharedIntroMessage: window.currentSharedIntroMessage || "",
     // responseStyle: responseStyleEl.value,
-    // responseStyleCustomInput: responseStyleCustomInputEl.value,
-    // storyWritingStyleCustomInput: storyWritingStyleCustomInputEl.value,
+    storyWritingStyleResponseInput: storyWritingStyleResponseInputEl.value,
+    storyWritingStyleCustomInput: storyWritingStyleCustomInputEl.value,
     currentTrackedInfo: currentTrackedInfoEl.value,
     infoTrackingEnabled: infoTrackingBtn.dataset.enabled,
     gameMode: storyGameModeSelectEl.value,

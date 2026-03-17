@@ -521,7 +521,7 @@ if(localStorage.seenTopStuffOnce) {
         <div class="modalSectionTitle">Writing Style</div>
         <div class="modalRow themeInlineRow">
           <div class="modalRow" style="align-items:center; gap:0.35rem; flex:1; flex-wrap:wrap;">
-            <select id="storyWritingStyleSelectEl" style="flex:1; width:100%;" onchange="localStorage.storyWritingStyleSelect=this.value;">
+            <select id="storyWritingStyleSelectEl" style="flex:1; width:100%;" onchange="localStorage.storyWritingStyleSelect=this.value; storyCustomWritingStyleCtn.hidden=(this.value==='custom' ? false : true)">
               <option value="default" selected>Novel Style (Default)</option>
               <option value="descriptive">Descriptive</option>
               <option value="minimalist">Minimalistic</option>
@@ -536,7 +536,8 @@ if(localStorage.seenTopStuffOnce) {
               <option value_l="realist">Realist</option>
               <option value="naturalist">Naturalist</option>
               <option value="modernist">Modernist</option>
-              <option value="existing">Local (Learned)</option>
+              <option value="existing">Local (Learned)</option>              
+              <option value="custom">Custom</option>
             </select>
             <div id="storyStyleHelpCtn" class="storyStyleHelpCtn">
               <button id="storyStyleHelpBtn" class="storyStyleHelpBtn" title="Writing Styles">❓</button>
@@ -573,6 +574,23 @@ if(localStorage.seenTopStuffOnce) {
               <option value="4">4 Paragraphs</option>
               <option value="5">5 Paragraphs</option>
             </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="storyCustomWritingStyleCtn" class="modalSection" hidden> <!--Custom Writing Syle-->
+      <div class="modalSectionTitle">Custom Writing Style</div>
+      <div class="modalRow">
+        <div class="modalField">
+          <div class="fontFieldInputRow">
+            <input id="storyWritingStyleResponseInputEl" placeholder="e.g. 'maximum 3 sentences'">
+          </div>
+        </div>
+      </div>
+      <div class="modalRow">
+        <div class="modalField">
+          <div class="fontFieldInputRow">
+            <input id="storyWritingStyleCustomInputEl" placeholder="e.g. 'unpredictable, absurd, surprising'">
           </div>
         </div>
       </div>
@@ -645,7 +663,7 @@ if(localStorage.seenTopStuffOnce) {
         </div>
       </div>
     </div>
-        <div class="modalRow modalSectionRow"> <!--Game Mode / Dice Roll-->
+    <div class="modalRow modalSectionRow"> <!--Game Mode / Dice Roll-->
       <div class="modalSection modalSectionHalf">
         <div class="modalSectionTitle">Game Mode</div>
         <div class="modalRow themeInlineRow">
