@@ -2107,8 +2107,8 @@ async continueStory(opts) =>
     // Iterate through each section in bibleData
     bibleData.forEach(entry => {
       if (entry.hasContent) {
+        let paragraphs = storyText.split(/\n\s*\n/);
         if (!storyText.includes(entry.marker)) {
-          let paragraphs = storyText.split(/\n\s*\n/);
           if (paragraphs.length > 2) {
             // Insert marker before the last paragraph
             paragraphs.splice(paragraphs.length - 2, 0, entry.marker);
@@ -2116,6 +2116,25 @@ async continueStory(opts) =>
           } else {
             // If only one paragraph, just add it before it
             storyText = entry.marker + "\n\n" + storyText;
+          }
+        } else {
+          // Marker exists — check if it's in the LAST paragraph
+          let lastIndex = paragraphs.length - 1;
+          console.log("\n\n\n");
+          console.log(paragraphs[lastIndex]);
+          if (paragraphs[lastIndex].includes(entry.marker)) {
+            console.log("found matching marker");
+            // Remove marker from last paragraph
+            paragraphs[lastIndex] = paragraphs[lastIndex]
+              .replace(entry.marker, '')
+              .trim();
+    
+            // Insert marker before the last paragraph
+            let insertIndex = Math.max(0, paragraphs.length - 3);
+            
+            paragraphs.splice(insertIndex, 0, entry.marker);
+    
+            storyText = paragraphs.join("\n\n");
           }
         }
       }
