@@ -1357,6 +1357,17 @@ async createNewStory(opts) =>
     try { window.userClickedStop = true; window.lastGenerationStreamObj.stop(); } catch(e) {}
   }
 
+  if (Object.values(window.generatingBibleSection).some(v => v === true)) {
+    let ok = await confirmAsync("A bible section is currently generating. Stop it and create a new story?", {});
+    if(!ok) return null;
+    
+    try {
+      window.userClickedStop = true;
+      Object.entries(window.currentAutoBibleGeneration).forEach(([key, aiObj]) => {aiObj.stop?.();});
+      window.currentBibleGeneration?.stop();
+    } catch(e) {console.error(e);}
+  }
+
   // flush current saves before switching
   await saveCurrentStoryToKvNow();
   await flushAllStorySaves();
@@ -1745,7 +1756,20 @@ async switchToStory(id, opts) =>
   }
 
   if(window.currentlyGenerating && window.lastGenerationStreamObj) {
+    let ok = await confirmAsync("A paragraph is currently generating. Stop it and switch story?", {});
+    if(!ok) return null;
     try { window.userClickedStop = true; window.lastGenerationStreamObj.stop(); } catch(e) {}
+  }
+
+  if (Object.values(window.generatingBibleSection).some(v => v === true)) {
+    let ok = await confirmAsync("A bible section is currently generating. Stop it and create a new story?", {});
+    if(!ok) return null;
+    
+    try {
+      window.userClickedStop = true;
+      Object.entries(window.currentAutoBibleGeneration).forEach(([key, aiObj]) => {aiObj.stop?.();});
+      window.currentBibleGeneration?.stop();
+    } catch(e) {console.error(e);}
   }
 
   if(!opts.skipSaveCurrent) {
@@ -2382,14 +2406,14 @@ antiAntiLayoutJank(fn) => // due to browser's built-in anti-scroll-jank algorith
 
 generateWhatHappensNextIdeas(regen) =>
   if (codeDebug) console.log("generateWhatHappensNextIdeas");
-  whatHappensNextSuggestionsCtn.style.display = "";
-  generateWhatHappensNextIdeasBtn.disabled = true;
-  generateWhatHappensNextIdeasBtn.innerHTML = [icon("cog spin")];
-
   if(whatHappensNextSuggestionsCtn.innerHTML && !regen) {
+    generateWhatHappensNextIdeasBtn.innerHTML = icon("lightbulb","color:#ffe070;");    
     generateWhatHappensNextIdeasBtn.disabled = false;
     return;
   }
+  whatHappensNextSuggestionsCtn.style.display = "";
+  generateWhatHappensNextIdeasBtn.disabled = true;
+  generateWhatHappensNextIdeasBtn.innerHTML = [icon("cog spin")];
   let textSoFar = "";
   let pendingObj = ai({
     instruction: whatHappensNextInstruction.evaluateItem,
@@ -2607,7 +2631,7 @@ async autoUpdateBibleSection(options) =>
   try {
     window.generatingBibleSection[options.title] = true;
     if (codeDebug) console.log("autoUpdateBibleSection : try : " + window.generatingBibleSection[options.title]);
-    
+    if (codeDebug) console.log("autoUpdateBibleSection : try2 : " + window.generatingBibleSection);
     bibleData = await window.currentAutoBibleGeneration[options.title]; 
     
     if (bibleData.stopReason === 'error' || bibleData.stopReason === 'user') {
