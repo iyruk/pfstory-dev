@@ -2780,6 +2780,7 @@ async generateBibleSection(options) =>
 
   window.currentBibleGeneration = ai({
     instruction: bibleAutoUpdatePrompt.evaluateItem,
+    // startWith: window.existingSectionContentForPrompt,
     onChunk: (data) => {
       if (!data.isFromStartWith) {
         targetTextarea.value += data.textChunk;
@@ -5509,15 +5510,35 @@ getCombinedStoryBibleText(prompt) =>
   
 // This is the prompt for updating any bible section
 bibleAutoUpdatePrompt
-  You are an intelligent assistant that updates a Story Bible using new story events. Your task is to be precise and preserve existing information unless it's explicitly contradicted.
-
-  You are given:
-  • The EXISTING CONTENT for the section: [window.generatingBibleSectionName]
-  • NEW STORY EVENTS since the last update
-  • The STORY OVERVIEW for context and initial details like characters, inventory, lore.
-  • ADDITIONAL CONTENT to be added/populated in the section
+  You are an intelligent assistant that updates a Story Bible using new story events.
+  Your task is to update ONLY ONE section at a time. You must be precise and preserve existing information unless it is explicitly contradicted.
   
   ---
+  
+  CURRENT SECTION: [window.generatingBibleSectionName]
+
+  You are ONLY updating this section. Any information not belonging to this section must be ignored.
+
+  ---
+  
+  You are given:
+  * The EXISTING CONTENT for the section: [window.generatingBibleSectionName]
+  * NEW STORY EVENTS since the last update
+  * The STORY OVERVIEW for context and initial details like characters, inventory, lore.
+  * ADDITIONAL CONTENT to be added/populated in the section
+
+  ---
+  
+  OTHER SECTIONS (REFERENCE ONLY - DO NOT MODIFY):
+  <Player Info> → Player attributes, inventory, time, weather
+  <Other Characters> → Non-player characters only
+  <Locations> → Places only
+  <Events/Plot> → Events and outcomes
+  <Lore/History> → Factions and world lore
+  <Plot Threads> → Ongoing mysteries and clues
+  
+  ---
+  
   RULES:
   
   1. Read the NEW STORY EVENTS carefully.
@@ -5531,9 +5552,9 @@ bibleAutoUpdatePrompt
   9. When listing relationships, include only: NAME (relationship). - Do not describe the other character.
   10. Refer to the player as their name if given, otherwise "Main Character".
     - If multiple are specified in the overview, use "Main Characters" and structure them separately under Player Info & Inventory.
-  11. Use the reference format as a guidelinel; you may add new sections or reorganize if needed.
+  11. Use the reference format as a guideline; you may add new sections or reorganize if needed.
   12. Do not place Main Character inside Other Characters.
-  13. Only Main Character should in in Player Info
+  13. Only Main Character should be in Player Info, never in any other section
   14. Do not mix sections.
     - Mysteries do not go in Lore & Factions.
     - Factions do not go in Mysteries & Plot Threads.
@@ -5541,6 +5562,12 @@ bibleAutoUpdatePrompt
     - Only include facts explicitly stated in the NEW STORY EVENTS.
     - If a field is requested but you have no data but "Not discovered"
   16. You MUST populate additional data as new entries or lines depending on what's needed: [bibleSectionAdditionaInfo()]
+  19. Examples of INVALID behavior:
+    - Adding LOCATION data inside Other Characters → INVALID
+    - Adding FACTIONS inside Plot Threads → INVALID
+    - Adding INVENTORY items outside Player Info → INVALID
+
+    These must NEVER occur.
 
   GUIDELINES:
 
@@ -5568,7 +5595,7 @@ bibleAutoUpdatePrompt
   ---
   REFERENCE FORMAT (guideline)
 
-  Here is a suggested structure you can use as a reference. You mar add, skip, or reorganize sections if the story requires it.
+  Here is a suggested structure you can use as a reference. You may add, skip, or reorganize sections if the story requires it.
   Do not output the word "SECTION:" in the final answer.
   [bibleSectionFormat(window.generatingBibleSectionName)]
 
