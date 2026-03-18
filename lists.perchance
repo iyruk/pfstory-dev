@@ -43,7 +43,7 @@ bibleOptionalPrompt = ""
 // This is the task instruction that's appended to the story text when the player takes an action. You can edit it and then click the reload button to test your changes. And you can of course click save to create your own custom copy of this generator.
 consequencesOfActionTaskInstruction
   [getExtraInstructionsForConsequencesOfAction()]
-  TASK: Above is the player's next action/speech/command in this adventure. You are the world's best Game Master - a masterful storyteller with a perfect sense for pacing, intrigue, and a knack for keeping players on the edge of their seat, and your task is to write the result of NEXT_ACTION (including NPC dialogue and story progression if relevant). When referring to the player, use a [storyPerspective] person perspective. The Game Master only simulates the world, not the player; your response should not invoke new player actions - only describe the consequences of the player's actions, and *gives life to them* to create an engaging story. 
+  TASK: Above is the player's next action/speech/command in this adventure. You are the world's best Game Master - a masterful storyteller with a perfect sense for pacing, intrigue, and a knack for keeping players on the edge of their seat, and your task is to write the result of NEXT_ACTION (including NPC dialogue and story progression if relevant). When referring to the player, use a [storyPerspective] person perspective. The Game Master only simulates the world, not the player; your response should not invoke new player actions - only describe the consequences of the player's actions, and *gives life to them* to create an engaging story.
   [""] // blank line
   [getStoryPrefixData(window.continueMode)]
   // [startWithPrefix]  // see the `startWithPrefix = ...` above line, which includes the 'writing style' input.
@@ -124,22 +124,13 @@ rollDice(dice) =>
   if(codeDebug) {console.log("diceroll: "+localStorage.dieRoll);}
 
 getDifficultyModifiers() =>
-  if(codeDebug) {console.log("getDifficultyModifiers");}
-  let difficulty = {
-    hard:{critSuccess:20,success:15,fail:10,critFail:1},
-    free:{critSuccess:15,success:10,fail:1},
-    impossible:{critSuccess:21,success:20,fail:10,critFail:5}
-  }[difficultyModeEl.value] || {critSuccess:20,success:15,fail:5,critFail:1};
+  if (codeDebug) console.log("getDifficultyModifiers");
 
-  if(storyDiceCheckbox.checked){
-    const roll = +localStorage.dieRoll;
-    if(!roll) return "The player's attempt has resulted in a neutral outcome.";
-    if(roll >= difficulty.critSuccess) return "The player has succeeded in their action in the best possible way.";
-    if(roll >= difficulty.success) return "The player has succeeded in their action.";
-    if(roll <= difficulty.critFail) return "The player has failed in their action in the worst possible way.";
-    if(roll <= difficulty.fail) return "The player has failed in their action.";
-    return "The player's attempt has resulted in a neutral outcome.";
-  }
+  const difficulty = {
+    hard: { critSuccess: 20, success: 15, fail: 10, critFail: 1 },
+    free: { critSuccess: 15, success: 10, fail: 1 },
+    impossible: { critSuccess: 21, success: 20, fail: 10, critFail: 5 }
+  }[difficultyModeEl.value] || { critSuccess: 20, success: 15, fail: 5, critFail: 1 };
 
   const modes = {
     normal: `DIFFICULTY_LEVEL: **NORMAL** *(Normal expected responses from NPCs based on the player's actions)*`,
@@ -148,15 +139,38 @@ getDifficultyModifiers() =>
     free: `DIFFICULTY_LEVEL: **VERY EASY** (NPCs will accept the player's actions; no consequences; the player can do anything)`,
     impossible: `DIFFICULTY_LEVEL: **IMPOSSIBLE** (Everything the player tries will fail; horrible things will happen; the player cannot succeed)`
   };
-  
-  return modes[difficultyModeEl.value] || modes.normal;
-  
-  
+
+  const difficultyText = modes[difficultyModeEl.value] || modes.normal;
+
+  if (storyDiceCheckbox.checked) {
+    const roll = +localStorage.dieRoll;
+
+    let result;
+    if (!roll) result = "The player's attempt has resulted in a neutral outcome.";
+    else if (roll >= difficulty.critSuccess) result = "The player has succeeded in their action in the best possible way.";
+    else if (roll >= difficulty.success) result = "The player has succeeded in their action.";
+    else if (roll <= difficulty.critFail) result = "The player has failed in their action in the worst possible way.";
+    else if (roll <= difficulty.fail) result = "The player has failed in their action.";
+    else result = "The player's attempt has resulted in a neutral outcome.";
+
+    // 🔥 Combine BOTH
+    return `
+    ${difficultyText}
+    DICE_ROLL: ${result}
+    GUIDANCE: Use the above information to narrate the player's action outcome. 
+    - If dice roll indicates success, describe a successful action.
+    - If failure, describe failure.
+    - Match the action to the difficulty level.
+    - Avoid unrelated plot twists or contradictions.
+    `.trim();
+  }
+  return difficultyText;
+   
 getExtraInstructionsForConsequencesOfAction() =>
   if(codeDebug){ console.log("getExtraInstructionsForConsequencesOfAction");}
   let lines = [];
-  lines.push(getCombinedStoryBibleText() || null);
   lines.push(storyGameModeSelectEl.value === "game" ? "You should sometimes note any interactable objects/items/exits/etc in the environment, in typical text game style.": null);
+  lines.push(storyNamingConventionSelectEl.value !== "" ? `Use ${storyNamingConventionSelectEl.value} naming conventions.` : null);
   lines.push(getDifficultyModifiers());
   lines = lines.filter(l => l); // filter out `null` lines
   let text = lines.join("\n").trim();
@@ -195,7 +209,7 @@ sharedInstructionPrefix // stuff that we put before all tasks - i.e. general con
   - This game never ends. Vary the pacing, and when narratively appropriate, you should proactively drive the story forward, introducing new arcs, and new events/situations for the player to react to - but don't overdo it, and don't overly protagonize the player or overdramatize everything. Instead, give the world real 'depth' that goes beyond the player. Other characters will have their own motivations and interests that may be completely unrelated to the player. E.g. two characters can sometimes just have a simple conversation without it being part of some grand story arc. The world is *real*, and exists for itself, not a "potemkin village" designed for the player.
   - Aggression, graphic violence, death, character toxicity, and vulgarity are allowed in scenarios with mature themes. You should portray conflict and suffering realistically, without shallow resolutions.
   - Escalate tensions gradually, creating a sense of anticipation.
-  - All posts must follow the 3 step format rule.
+  - Maintain strict spatial continuity. The player's current location is determined solely by the last paragraph of the STORY SO FAR. The 'Locations' reference is a static map, not a sequence of events.
   - Avoid unnecessary and unoriginal repetition of previous story text.
   - You should sometimes note any interactable objects/items/exits/etc in the environment, in typical text adventure style.
   - For coherent and grounded gameplay, ensure game world rules are enforced. For example, a character cannot cast a spell if it's clear that they have no magical skills, or they have zero mana, or there is no magic in this world, etc.
@@ -222,6 +236,7 @@ sharedInstructionPrefix // stuff that we put before all tasks - i.e. general con
   // - Don't bore the player with excessive descriptions. This is a game, not a novel.
   [""]
   [storySoFarEl.value.trim().length < 700 ? `\n# Forbidden Words:\n- cacophony\n- symphony\n- verdant\n- tapestry/tapestries\n- testament\n- sentinel\n- cerulean\n- whisper/whispers/whispering/whispered\n- sun kissed the horizon\n- stark\n- reminder\n` : ""]
+  [getCombinedStoryBibleText()]
   # Overall, here's what the adventure should be about[storySoFarEl.value.trim().length < 1000 ? " (lead into this slowly)" : ""]: // while the story is less than 1000 characters long, we tell the AI to lead into it slowly, so it doesn't try to immediately jump to important plot points that are specified in the overview
   OVERVIEW: [literal(storyOverviewEl.value.trim()) || "(Unsure, you decide.)"]
   [""]
@@ -656,6 +671,7 @@ normalizeStoryData(data) =>
     storyWritingStyleCustomInput: (data.storyWritingStyleCustomInput ?? ""),
     storyPerspective: (data.storyPerspective ?? ""),
     gameMode: (data.gameMode ?? ""),
+    storyNamingConventionSelect: (data.storyNamingConventionSelect ?? ""),
     difficultyMode: (data.difficultyMode ?? ""),
     storyWritingStyle: (data.storyWritingStyle ?? ""),
     storyWritingLength: (data.storyWritingLength ?? ""),
@@ -772,6 +788,7 @@ getCurrentStoryDataForStorage() =>
     storyDiceEnabled: !!storyDiceCheckbox.checked,
     toggleSendStoryInput: !!toggleSendStoryInputCheckbox.checked,
     gameMode: storyGameModeSelectEl.value,
+    storyNamingConventionSelect: storyNamingConventionSelectEl.value,
     difficultyMode: difficultyModeEl.value,
     storyWritingStyle: storyWritingStyleSelectEl.value,
     storyWritingLength: storyWritingLengthEl.value,
@@ -2023,17 +2040,11 @@ getPreprocessedStoryText() =>
   } catch(e) {
     console.error("Falling back to using *all* messages because there was an error while trying to compute messagesWithSummaryReplacements:", e);
   }
-  // === REPLACE MARKERS WITH SECTION CONTENT ===
+  // === REMOVE BIBLE MARKERS ===
   if (Array.isArray(bibleData)) {
     bibleData.forEach(section => {
       const markerRegex = new RegExp(`(^|\\n+)${section.marker}\\n*`);
-      if (section.hasContent && section.data?.content?.trim()) {
-        const formattedSection =
-          `\n\n<tracked_info>\n${section.data.content.trim()}\n</tracked_info>\n\n`;
-        resultText = resultText.replace(markerRegex, formattedSection);
-      } else {
-        resultText = resultText.replace(markerRegex, "\n\n");
-      }
+      resultText = resultText.replace(markerRegex, "\n\n");
     });
   }
   return resultText;
@@ -2105,52 +2116,48 @@ async continueStory(opts) =>
     let storyText = storySoFarEl.value.trim();
   
     // Iterate through each section in bibleData
-    bibleData.forEach(entry => {
-      if (entry.hasContent) {
-        let paragraphs = storyText.split(/\n\s*\n/);
-    
-        // Find last paragraph that does NOT start with "<"
-        let targetIndex = -1;
-        for (let i = paragraphs.length - 1; i >= 0; i--) {
-          if (!paragraphs[i].trim().startsWith("<")) {
-            targetIndex = i;
-            break;
-          }
-        }
-    
-        if (!storyText.includes(entry.marker)) {
-          if (targetIndex !== -1) {
-            paragraphs.splice(targetIndex, 0, entry.marker);
-            storyText = paragraphs.join("\n\n");
-          } else {
-            // fallback
-            storyText = entry.marker + "\n\n" + storyText;
-          }
-        } else {
-          // Remove marker from wherever it exists
-          paragraphs = paragraphs.map(p =>
-            p.replace(entry.marker, '').trim()
-          ).filter(p => p !== '');
-    
-          // Recalculate target index after cleanup
-          targetIndex = -1;
-          for (let i = paragraphs.length - 1; i >= 0; i--) {
-            if (!paragraphs[i].trim().startsWith("<")) {
-              targetIndex = i;
-              break;
-            }
-          }
-    
-          if (targetIndex !== -1) {
-            paragraphs.splice(targetIndex, 0, entry.marker);
-          } else {
-            paragraphs.unshift(entry.marker);
-          }
-    
-          storyText = paragraphs.join("\n\n");
+  bibleData.forEach(entry => {
+    if (entry.hasContent) {
+      let paragraphs = storyText.split(/\n\s*\n/);
+  
+      // 1. Find the target position (last paragraph not starting with "<")
+      let targetIndex = -1;
+      for (let i = paragraphs.length - 1; i >= 0; i--) {
+        if (!paragraphs[i].trim().startsWith("<")) {
+          targetIndex = i;
+          break;
         }
       }
-    });
+  
+      // 2. Check if the marker already exists
+      const markerIndex = paragraphs.findIndex(p => p.includes(entry.marker));
+  
+      if (markerIndex === -1) {
+        // Marker doesn't exist: Add it at targetIndex
+        if (targetIndex !== -1) {
+          paragraphs.splice(targetIndex, 0, entry.marker);
+        } else {
+          paragraphs.unshift(entry.marker);
+        }
+      } else {
+        // Marker exists: Only move it if it's currently AFTER the targetIndex
+        // We also check if targetIndex is valid.
+        if (targetIndex !== -1 && markerIndex > targetIndex) {
+          // Remove from old position
+          paragraphs.splice(markerIndex, 1);
+          
+          // Re-calculate targetIndex if the removal shifted the array
+          // (Though since markerIndex > targetIndex, targetIndex remains the same)
+          paragraphs.splice(targetIndex, 0, entry.marker);
+        } else {
+          // If marker is already before or at the target, we do nothing.
+          return; 
+        }
+      }
+  
+      storyText = paragraphs.join("\n\n");
+    }
+  });
   
     // Update the textarea with cleaned and updated story
     storySoFarEl.value = storyText.trim();
@@ -2310,8 +2317,6 @@ async continueStory(opts) =>
   console.log("Finished taskPrompt");
   console.log(window.taskPrompt);
   window.storyTextBeforeLastGeneration = storySoFarEl.value;
-
-  
   
   if(hasActualStoryContent()) {
     if (codeDebug) console.log("Continuing story");
@@ -2874,6 +2879,7 @@ loadChatDataIntoInputAreas(data) =>
   storyPerspectiveSelectEl.value = data.storyPerspective || "second";
   difficultyModeEl.value = data.difficultyMode || "";
   storyGameModeSelectEl.value = data.gameMode || "";
+  storyNamingConventionSelectEl.value = data.storyNamingConventionSelect || "";
   storyWritingLengthEl.value = data.storyWritingLength || "1",
   storyGenreSelectEl.value = data.storyGenreSelect || "default",
   storySubGenreSelectEl.value = data.storySubGenreSelect || "default",
@@ -2913,6 +2919,7 @@ loadChatDataIntoInputAreas(data) =>
   currentTrackedInfoEl.value = data.currentTrackedInfo || "";
   infoTrackingBtn.dataset.enabled = data.infoTrackingEnabled || "";
   storyGameModeSelectEl.value = data.gameMode || "";
+  storyNamingConventionSelectEl.value = data.storyNamingConventionSelect || "";
   storyDashesCheckbox.checked = data.storyDashesEnabled || "";
   localStorage.storyBibleAutoCheckbox_PlayerInfo = data.storyBibleAuto_PlayerInfo || "";
   localStorage.storyBibleAutoCheckbox_OtherCharacters = data.storyBibleAuto_OtherCharacters || "";
@@ -3199,6 +3206,7 @@ getCurrentStoryData() =>
     currentTrackedInfo: currentTrackedInfoEl.value,
     infoTrackingEnabled: infoTrackingBtn.dataset.enabled,
     gameMode: storyGameModeSelectEl.value,
+    storyNamingConventionSelectL: storyNamingConventionSelectEl.value,
     storyDashesEnabled: storyDashesCheckbox.checked,    
     storyBibleAuto_PlayerInfo: localStorage.storyBibleAutoCheckbox_PlayerInfo,
     storyBibleAuto_OtherCharacters: localStorage.storyBibleAutoCheckbox_OtherCharacters,
@@ -5209,7 +5217,8 @@ summaryPromptInstruction
   ```
   [""]
   # Story Overview:
-  [literal(storyOverviewEl.value.trim().replace(/\n+/g, "\n") || "(Not specified.)")][getCombinedStoryBibleText()]
+  [literal(storyOverviewEl.value.trim().replace(/\n+/g, "\n") || "")]
+  [getCombinedStoryBibleText()]
   [""]
   # Summary of Previous Events:
   [literal(window.summaryMessagesForInstruction.join("\n"))]
@@ -5510,16 +5519,37 @@ getCombinedStoryBibleText(prompt) =>
 
   // Construct bible content as before
   const [playerInfo, charactersInfo, locationsInfo, eventsInfo, loreInfo, mysteriesInfo] = sectionContents;
-  
-  let bibleContent = 
-    "## Player Info & Inventory:\n" + (literal(playerInfo) || "(Not specified.)") + "\n\n" +
-    "## Other Characters:\n" + (literal(charactersInfo) || "(Not specified.)") + "\n\n" +
-    "## Locations:\n" + (literal(locationsInfo) || "(Not specified.)") + "\n\n" +
-    "## Events & Plot:\n" + (literal(eventsInfo) || "(Not specified.)") + "\n\n" +
-    "## Lore & Factions:\n" + (literal(loreInfo) || "(Not specified.)") + "\n\n" +
-    "## Mysteries & Plot Threads:\n" + (literal(mysteriesInfo) || "(Not specified.)");
 
-  return "\n\n<tracked_info>\n# STORY BIBLE\n" + bibleContent.trim() + "\n</tracked_info>";
+  let sections = [];
+  
+  const add = (title, content) => {
+    let trimmed = (content || "").trim();
+    if (trimmed && trimmed !== "undefined" && trimmed !== "(Not specified.)") {
+      sections.push(`### ${title}:\n${literal(trimmed)}`);
+    }
+  };
+
+  add("PLAYER INFO & INVENTORY", playerInfo);
+  add("CHARACTERS", charactersInfo);
+  add("LOCATIONS & LAYOUT", locationsInfo);
+  add("PLOT & EVENTS", eventsInfo);
+  add("LORE & FACTIONS", loreInfo);
+  add("MYSTERIES & THREADS", mysteriesInfo);
+
+  if (sections.length === 0) return "";
+
+  let bibleContent = sections.join("\n\n");
+
+  return `
+  # PERSISTENT WORLD DATA (REFERENCE ONLY)
+  The following is a lookup table for world consistency. 
+  - DO NOT assume characters are present unless the story places them there.
+  - DO NOT "teleport" the player; these are map details, not the current scene.
+  - Use this ONLY to ensure names, traits, and layouts remain consistent.
+  
+  <world_knowledge_base>
+  ${sections.join("\n\n")}
+  </world_knowledge_base>`.trim();
   
 // This is the prompt for updating any bible section
 bibleAutoUpdatePrompt

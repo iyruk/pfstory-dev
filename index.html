@@ -199,7 +199,7 @@ if(localStorage.seenTopStuffOnce) {
 <div id="notepadPanel" hidden>
   <div id="notepadResizeHandle" title="Resize"></div>
   <div class="notepadHeader">
-    <button class="btn-icon" id="closeNotepadBtn" onclick="closeNotepadPanel()" title="Close">✕</button>
+    <button class="btn-icon" id="closeNotepadBtn" onclick="closeNotepadPanel()" title="Close" style="width:37px; height:37px;">[icon("far-circle-xmark")]</button>
     <select id="notepadScopeSelectEl" onchange="setNotepadScope(this.value)">
       <option hidden value="bible" selected>Current Story's Bible</option>
       <option value="story" selected>Current Story's Notebook</option>
@@ -208,7 +208,7 @@ if(localStorage.seenTopStuffOnce) {
   </div>
   <div class="notepadTabsRow">
     <select id="notepadTabsSelectEl" onchange="onNotepadTabsSelectChange(this.value)"></select>
-    <button class="btn-icon" id="notepadTabsMenuBtn" onclick="toggleNotepadTabMenu()" title="Tab options">⚙️</button>
+    <button class="btn-icon" id="notepadTabsMenuBtn" onclick="toggleNotepadTabMenu()" title="Tab options" style="width:37px; height:37px;">[icon("ellipsis-vertical")]</button>
   </div>
   <div id="notepadBibleCtn" hidden>
     <span id="storyBibleLoader" hidden>[icon("spinner spin-pulse")]</span>
@@ -523,21 +523,21 @@ if(localStorage.seenTopStuffOnce) {
           <div class="modalRow" style="align-items:center; gap:0.35rem; flex:1; flex-wrap:wrap;">
             <select id="storyWritingStyleSelectEl" style="flex:1; width:100%;" onchange="localStorage.storyWritingStyleSelect=this.value; storyCustomWritingStyleCtn.hidden=(this.value==='custom' ? false : true)">
               <option value="default" selected>Novel Style (Default)</option>
-              <option value="descriptive">Descriptive</option>
-              <option value="minimalist">Minimalistic</option>
-              <option value="poetic">Poetic</option>
-              <option value="journalistic">Journalistic</option>
-              <option value="wonderous">Wonderous</option>
-              <option value="stream_of_consciousness">Stream of Consciousness</option>
-              <option value="epistolary">Epistolary</option>
-              <option value="satirical">Satirical</option>
-              <option value="gothic">Gothic</option>
-              <option value="romantic">Romantic</option>
-              <option value_l="realist">Realist</option>
-              <option value="naturalist">Naturalist</option>
-              <option value="modernist">Modernist</option>
-              <option value="existing">Local (Learned)</option>              
               <option value="custom">Custom</option>
+              <option value="descriptive">Descriptive</option>
+              <option value="epistolary">Epistolary</option>
+              <option value="gothic">Gothic</option>
+              <option value="journalistic">Journalistic</option>
+              <option value="existing">Local (Learned)</option>
+              <option value="minimalist">Minimalistic</option>
+              <option value="modernist">Modernist</option>
+              <option value="naturalist">Naturalist</option>
+              <option value="poetic">Poetic</option>
+              <option value_l="realist">Realist</option>
+              <option value="romantic">Romantic</option>
+              <option value="satirical">Satirical</option>
+              <option value="stream_of_consciousness">Stream of Consciousness</option>
+              <option value="wonderous">Wonderous</option>
             </select>
             <div id="storyStyleHelpCtn" class="storyStyleHelpCtn">
               <button id="storyStyleHelpBtn" class="storyStyleHelpBtn" title="Writing Styles">❓</button>
@@ -545,18 +545,18 @@ if(localStorage.seenTopStuffOnce) {
                 <div style="text-align: left;">
                   <strong>Novel Style (Default):</strong> Clear, balanced, engaging storytelling.<br>
                   <strong>Descriptive:</strong> Rich, sensory details. Vivid settings and characters.<br>
-                  <strong>Minimalist:</strong> Short, direct sentences. Sparse and clean prose.<br>
-                  <strong>Poetic:</strong> Evocative imagery, metaphor, lyrical and flowing.<br>
-                  <strong>Journalistic:</strong> Objective, factual, concise, newspaper-like.<br>
-                  <strong>Wonderous:</strong> Awe-inspiring, imaginative, optimistic tone.<br>
-                  <strong>Stream of Consciousness:</strong> Continuous train of thought, raw and unfiltered.<br>
                   <strong>Epistolary:</strong> Told through letters, diaries, emails; coherent overall.<br>
-                  <strong>Satirical:</strong> Ironic, witty, exaggerated, subversive tone.<br>
                   <strong>Gothic:</strong> Dramatic, moody, suspenseful, dark atmosphere.<br>
-                  <strong>Romantic:</strong> Passionate, emotional, awe of nature.<br>
-                  <strong>Realist:</strong> True-to-life, straightforward depiction of everyday reality.<br>
+                  <strong>Journalistic:</strong> Objective, factual, concise, newspaper-like.<br>
+                  <strong>Minimalist:</strong> Short, direct sentences. Sparse and clean prose.<br>
+                  <strong>Modernist:</strong> Inner experience, fragmented form, alienation themes.<br>
                   <strong>Naturalist:</strong> Deterministic, environment-driven characters, grim tone.<br>
-                  <strong>Modernist:</strong> Inner experience, fragmented form, alienation themes.
+                  <strong>Poetic:</strong> Evocative imagery, metaphor, lyrical and flowing.<br>
+                  <strong>Realist:</strong> True-to-life, straightforward depiction of everyday reality.<br>
+                  <strong>Romantic:</strong> Passionate, emotional, awe of nature.<br>
+                  <strong>Satirical:</strong> Ironic, witty, exaggerated, subversive tone.<br>
+                  <strong>Stream of Consciousness:</strong> Continuous train of thought, raw and unfiltered.<br>
+                  <strong>Wonderous:</strong> Awe-inspiring, imaginative, optimistic tone.<br>
                 </div>
               </div>
             </div>
@@ -602,29 +602,29 @@ if(localStorage.seenTopStuffOnce) {
           <div class="modalRow" style="align-items:center; gap:0.35rem; flex:1; flex-wrap:wrap;">
             <select id="storyGenreSelectEl" style="flex:1; width:100%;" onchange="localStorage.storyGenreSelect=this.value;">
               <option value="default" selected>Default (no change)</option>
-              <option value="fantasy">Fantasy</option>
-              <option value="dark_fantasy">Dark Fantasy</option>
-              <option value="sci_fi">Sci-Fi</option>
-              <option value="noir">Noir</option>
-              <option value="mystery">Mystery</option>
-              <option value="thriller">Thriller</option>
-              <option value="horror">Horror</option>
-              <option value="contemporary">Contemporary</option>
-              <option value="slice_of_life">Slice of Life</option>
-              <option value="romance">Romance</option>
-              <option value="self_help">Self-Help</option>
-              <option value="historical_fiction">Historical Fiction</option>
-              <option value="dystopian">Dystopian</option>
-              <option value="cyberpunk">Cyberpunk</option>
-              <option value="steampunk">Steampunk</option>
-              <option value="post_apocalyptic">Post-Apocalyptic</option>
-              <option value="western">Western</option>
-              <option value="comedy">Comedy</option>
               <option value="adventure">Adventure</option>
+              <option value="comedy">Comedy</option>
+              <option value="contemporary">Contemporary</option>
+              <option value="cyberpunk">Cyberpunk</option>
+              <option value="dark_fantasy">Dark Fantasy</option>
+              <option value="dystopian">Dystopian</option>
+              <option value="fantasy">Fantasy</option>
+              <option value="historical_fiction">Historical Fiction</option>
+              <option value="horror">Horror</option>
+              <option value="mystery">Mystery</option>
+              <option value="noir">Noir</option>
+              <option value="political">Political</option>
+              <option value="post_apocalyptic">Post-Apocalyptic</option>
+              <option value="romance">Romance</option>
+              <option value="sci_fi">Sci-Fi</option>
+              <option value="self_help">Self-Help</option>
+              <option value="slice_of_life">Slice of Life</option>
               <option value="spy">Spy</option>
-              <option value="war">War</option>
+              <option value="steampunk">Steampunk</option>
               <option value="superhero">Superhero</option>
-              <option value="political">Political</option>        
+              <option value="thriller">Thriller</option>
+              <option value="war">War</option>
+              <option value="western">Western</option>       
             </select>
           </div>
         </div>
@@ -635,29 +635,29 @@ if(localStorage.seenTopStuffOnce) {
           <div class="modalRow" style="align-items:center; gap:0.35rem; flex:1; flex-wrap:wrap;">
             <select id="storySubGenreSelectEl" style="flex:1; width:100%;" onchange="localStorage.storySubGenreSelect=this.value;">
               <option value="default" selected>None</option>
-              <option value="fantasy">Fantasy</option>
-              <option value="dark_fantasy">Dark Fantasy</option>
-              <option value="sci_fi">Sci-Fi</option>
-              <option value="noir">Noir</option>
-              <option value="mystery">Mystery</option>
-              <option value="thriller">Thriller</option>
-              <option value="horror">Horror</option>
-              <option value="contemporary">Contemporary</option>
-              <option value="slice_of_life">Slice of Life</option>
-              <option value="romance">Romance</option>
-              <option value="self_help">Self-Help</option>
-              <option value="historical_fiction">Historical Fiction</option>
-              <option value="dystopian">Dystopian</option>
-              <option value="cyberpunk">Cyberpunk</option>
-              <option value="steampunk">Steampunk</option>
-              <option value="post_apocalyptic">Post-Apocalyptic</option>
-              <option value="western">Western</option>
-              <option value="comedy">Comedy</option>
               <option value="adventure">Adventure</option>
-              <option value="spy">Spy</option>
-              <option value="war">War</option>
-              <option value="superhero">Superhero</option>
+              <option value="comedy">Comedy</option>
+              <option value="contemporary">Contemporary</option>
+              <option value="cyberpunk">Cyberpunk</option>
+              <option value="dark_fantasy">Dark Fantasy</option>
+              <option value="dystopian">Dystopian</option>
+              <option value="fantasy">Fantasy</option>
+              <option value="historical_fiction">Historical Fiction</option>
+              <option value="horror">Horror</option>
+              <option value="mystery">Mystery</option>
+              <option value="noir">Noir</option>
               <option value="political">Political</option>
+              <option value="post_apocalyptic">Post-Apocalyptic</option>
+              <option value="romance">Romance</option>
+              <option value="sci_fi">Sci-Fi</option>
+              <option value="self_help">Self-Help</option>
+              <option value="slice_of_life">Slice of Life</option>
+              <option value="spy">Spy</option>
+              <option value="steampunk">Steampunk</option>
+              <option value="superhero">Superhero</option>
+              <option value="thriller">Thriller</option>
+              <option value="war">War</option>
+              <option value="western">Western</option>  
             </select>
           </div>
         </div>
@@ -685,14 +685,51 @@ if(localStorage.seenTopStuffOnce) {
         <div  style="text-align:left; font-size:80%;">Adds a challenge to the story/game.</div>
       </div>
     </div>
-    <div class="modalSection"> <!--Formatting-->
-      <div class="modalSectionTitle">Formatting</div>
-      <div class="modalRow">
-        <label><input id="storyDashesCheckbox" oninput="localStorage.storyDashesEnabled=this.checked ? '1' : '';" type="checkbox"> Allow —/– dashes (Em/En dashes)</label>        
+    <div class="modalRow modalSectionRow"> <!--Naming Scheme / Formatting-->
+      <div class="modalSection modalSectionHalf">
+        <div class="modalSectionTitle">Naming Conventions</div>
+        <div class="modalRow themeInlineRow">
+          <div class="modalRow" style="align-items:center; gap:0.35rem; flex:1; flex-wrap:wrap;">
+            <select id="storyNamingConventionSelectEl" style="flex:1; width:100%;" onchange="localStorage.storyNamingConventionSelect=this.value;">
+              <option value="">Default</option>
+              <option value="aztec">Aztec</option>
+              <option value="celtic">Celtic</option>
+              <option value="chinese">Chinese</option>
+              <option value="dutch">Dutch</option>
+              <option value="egyptian">Egyptian</option>
+              <option value="english">English</option>
+              <option value="french">French</option>
+              <option value="german">German</option>
+              <option value="greek">Greek</option>
+              <option value="indian">Indian</option>
+              <option value="irish">Irish</option>
+              <option value="italian">Italian</option>
+              <option value="japanese">Japanese</option>
+              <option value="korean">Korean</option>
+              <option value="mayan">Mayan</option>
+              <option value="norse">Norse</option>
+              <option value="polish">Polish</option>
+              <option value="portuguese">Portuguese</option>
+              <option value="roman">Roman</option>
+              <option value="scottish">Scottish</option>
+              <option value="spanish">Spanish</option>
+              <option value="swedish">Swedish</option>
+            </select>
+          </div>
+        </div>
       </div>
-      
+      <div class="modalSection modalSectionHalf"> <!--Formatting-->
+        <div class="modalSectionTitle">Formatting</div>
+          <div class="modalRow themeInlineRow">
+          <div class="modalRow" style="align-items:center; gap:0.35rem;  align-items:center;">
+            <label><input id="storyDashesCheckbox" oninput="localStorage.storyDashesEnabled=this.checked ? '1' : '';" type="checkbox"> Allow —/– dashes</label>  
+          </div>
+        </div>
+        <div  style="text-align:left; font-size:80%;">This will allow Em/En dashes in the story.</div>
+      </div>
     </div>
-  </div></div>
+  </div>
+</div>
 
 <script>
   if(typeof storyMenuEl !== "undefined") {
