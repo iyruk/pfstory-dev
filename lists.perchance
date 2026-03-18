@@ -1512,14 +1512,17 @@ async deleteStory(id) =>
 
 async downloadStory(id) =>
   ensureStoryManager();
-  let entry = getMetaEntryById(id);
+  let storyId = id ?? window.storyManager?.currentId ?? null;
+  let entry = getMetaEntryById(storyId);
   if(!entry) return;
-  let data = await kv.stories.get(id);
+  let data = await kv.stories.get(storyId);
   data = normalizeStoryData(data);
   let filename = prompt("Choose a filename:", (entry.title || "story").trim().slice(0, 60) || "story");
   if(filename === null) return;
   filename = filename.trim() || "story";
-  filename += ".ai-story.json";
+  const now = new Date();
+  const timestamp = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
+  filename += `_${timestamp}.pfstory.json`;
   let blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   let url = URL.createObjectURL(blob);
   let a = document.createElement('a');
@@ -3227,15 +3230,6 @@ getCurrentStoryData() =>
     storyArcInstruction: storyArcInstructionEl.value,
     shortcutButtons: JSON.parse(localStorage.shortcutButtons || "[]"),
   };
-
-saveStoryDataToUsersDevice() => 
-  let data = getCurrentStoryData();
-  let filename = prompt("Choose a filename:", window.lastSaveFilenameUsed || "my-story");
-  if(filename === null) return;
-  window.lastSaveFilenameUsed = filename;
-  filename += ".ai-story.json";
-  let blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  downloadBlob(blob, filename);
   
 downloadBlob(blob, filename) =>
   let url = URL.createObjectURL(blob);

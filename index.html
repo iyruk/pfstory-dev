@@ -1520,7 +1520,7 @@ if(localStorage.seenTopStuffOnce) {
   <button id="pageMusicToggleBtn" onclick="togglePageMusicPlayback()" hidden>🎵</button>
 
   <div style="margin-top:1rem; display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:0.5rem;">
-    <button onclick="saveStoryDataToUsersDevice()" title="Ctrl+S / Cmd+S" style="width:max-content; height:min-content;">💾 Save story</button>
+    <button onclick="downloadStory()" title="Ctrl+S / Cmd+S" style="width:max-content; height:min-content;">💾 Save story</button>
     <button onclick="openImportModal()" style="width:max-content; height:min-content;">📁 Load</button>
     <button id="shareStoryBtn" onclick="openShareModal()" title="Save as sharable link" style="width:max-content; height:min-content;">🔗 Share</button>
     <button onclick="if(mediaSettingsBar.style.display === 'none') { mediaSettingsBar.style.display=''; this.textContent='🎵 Hide Music'; } else { mediaSettingsBar.style.display='none'; this.textContent='🎵 Show Music'; }">🎵 Show Music</button>
@@ -1544,7 +1544,7 @@ if(localStorage.seenTopStuffOnce) {
     document.addEventListener('keydown', e => {
       if((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault(); // prevent the browser save dialog from opening
-        saveStoryDataToUsersDevice();
+        downloadStory();
       }
     });
   </script>
