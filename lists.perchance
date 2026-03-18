@@ -2108,34 +2108,46 @@ async continueStory(opts) =>
     bibleData.forEach(entry => {
       if (entry.hasContent) {
         let paragraphs = storyText.split(/\n\s*\n/);
+    
+        // Find last paragraph that does NOT start with "<"
+        let targetIndex = -1;
+        for (let i = paragraphs.length - 1; i >= 0; i--) {
+          if (!paragraphs[i].trim().startsWith("<")) {
+            targetIndex = i;
+            break;
+          }
+        }
+    
         if (!storyText.includes(entry.marker)) {
-          if (paragraphs.length > 2) {
-            // Insert marker before the last paragraph
-            paragraphs.splice(paragraphs.length - 2, 0, entry.marker);
+          if (targetIndex !== -1) {
+            paragraphs.splice(targetIndex, 0, entry.marker);
             storyText = paragraphs.join("\n\n");
           } else {
-            // If only one paragraph, just add it before it
+            // fallback
             storyText = entry.marker + "\n\n" + storyText;
           }
         } else {
-          // Marker exists — check if it's in the LAST paragraph
-          let lastIndex = paragraphs.length - 1;
-          console.log("\n\n\n");
-          console.log(paragraphs[lastIndex]);
-          if (paragraphs[lastIndex].includes(entry.marker)) {
-            console.log("found matching marker");
-            // Remove marker from last paragraph
-            paragraphs[lastIndex] = paragraphs[lastIndex]
-              .replace(entry.marker, '')
-              .trim();
+          // Remove marker from wherever it exists
+          paragraphs = paragraphs.map(p =>
+            p.replace(entry.marker, '').trim()
+          ).filter(p => p !== '');
     
-            // Insert marker before the last paragraph
-            let insertIndex = Math.max(0, paragraphs.length - 3);
-            
-            paragraphs.splice(insertIndex, 0, entry.marker);
-    
-            storyText = paragraphs.join("\n\n");
+          // Recalculate target index after cleanup
+          targetIndex = -1;
+          for (let i = paragraphs.length - 1; i >= 0; i--) {
+            if (!paragraphs[i].trim().startsWith("<")) {
+              targetIndex = i;
+              break;
+            }
           }
+    
+          if (targetIndex !== -1) {
+            paragraphs.splice(targetIndex, 0, entry.marker);
+          } else {
+            paragraphs.unshift(entry.marker);
+          }
+    
+          storyText = paragraphs.join("\n\n");
         }
       }
     });
@@ -5633,7 +5645,9 @@ bibleSectionFormat(section) =>
       ## HEIGHT:
       ## ORIENTATION: 
       ## OCCUPATION:
-      ## DESCRIPTION:
+      ## PHYSICAL APPEARANCE: (do not include clothes, just the person itself)
+      ## BACKGROUND:
+      ## CLOTHES:
       ## NOTABLE TRAITS:
       ## INVENTORY LIST: 
       ## RELATIONSHIPS: NAME (relation); NAME (relation)
@@ -5652,7 +5666,9 @@ bibleSectionFormat(section) =>
   ## HEIGHT:
   ## OCCUPATION:
   ## BUST SIZE: (only if character is female)
-  ## DESCRIPTION:
+  ## PHYSICAL APPEARANCE: (do not include clothes, just the person itself)
+  ## BACKGROUND:
+  ## CLOTHES:
   ## RELATIONSHIPS:`
     );
   }
