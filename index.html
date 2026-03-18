@@ -1344,7 +1344,6 @@ if(localStorage.seenTopStuffOnce) {
   <div style="margin-top:0.5rem; display:flex; align-items:center; margin-bottom:0rem;">
     <button class="btn btn-action" id="generateBtn" onclick="continueStory(); requestSaveCurrentStory({debounceMs:1200});" style="font-size:150%;">Continue</button>
     <button class="btn" id="diceRollBtn" onclick="rollDice();" style="background: var(--bg-surface); border-radius: var(--radius); border:1px solid grey; padding:0.25rem; align-items: center; margin-left:0.5rem; font-size:1.0rem;" title="Dice Rolls Enabled.\nRolls automatically with Contiue button.\nClick to re-roll, Only useful for Regeneration.">[icon("dice-d20")]</button>
-      <script>setTimeout(() => { diceRollBtn.hidden=storyDiceCheckbox.checked?false:true; }, 100);</script>
     <div style="display:inline-flex; align-items:center; min-height:100%; width:0; position:relative;">
       <button class="btn-danger" id="stopBtn" onclick="window.userClickedStop = true; window.lastGenerationStreamObj.stop(); this.style.display='none'; " style="display:none; margin-left:0.5rem; min-width:max-content; font-size:1.0rem;">[icon("circle-stop","color:var(--danger);")] Stop</button>
     </div>

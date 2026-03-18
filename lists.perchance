@@ -2923,6 +2923,7 @@ loadChatDataIntoInputAreas(data) =>
   storyDiceCheckbox.checked = data.storyDiceEnabled || "";
   toggleSendStoryInputCheckbox.checked = data.toggleSendStoryInput || "";
   diceRollBtn.innerHTML = `${icon("dice-d20")}` + localStorage.dieRoll || `${icon("dice-d20")}`;
+  diceRollBtn.hidden = data.storyDiceEnabled?false:true;
   updateInfoTrackingDisplay(false);
   
   updateButtonsDisplay();
