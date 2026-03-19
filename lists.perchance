@@ -1523,7 +1523,7 @@ async downloadStory(id) =>
   if(filename === null) return;
   filename = filename.trim() || "story";
   const suffix = localStorage.saveFileSuffix || "pfstory";
-  if (localStorage.saveFileTimestap === "1") {
+  if (localStorage.saveFileTimestamp.checked !== "1") {
     const now = new Date();
     const timestamp = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
     filename += `_${timestamp}`;
