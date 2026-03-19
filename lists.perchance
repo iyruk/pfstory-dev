@@ -797,7 +797,7 @@ getCurrentStoryDataForStorage() =>
     storyArcInstruction: storyArcInstructionEl.value,
     emDashesComfirmation: localStorage.emDashesComfirmation || "",
     shortcutButtons: JSON.parse(localStorage.shortcutButtons || "[]"),
-    saveFileTimestamp: !!localStorage.saveFileTimestamp.checked,
+    saveFileTimestamp: !!localStorage.saveFileTimestamp || "", 
     saveFileSuffix: localStorage.saveFileSuffix || "",
   });
 
