@@ -46,8 +46,6 @@ consequencesOfActionTaskInstruction
   TASK: Above is the player's next action/speech/command in this adventure. You are the world's best Game Master - a masterful storyteller with a perfect sense for pacing, intrigue, and a knack for keeping players on the edge of their seat, and your task is to write the result of NEXT_ACTION (including NPC dialogue and story progression if relevant). When referring to the player, use a [storyPerspective] person perspective. The Game Master only simulates the world, not the player; your response should not invoke new player actions - only describe the consequences of the player's actions, and *gives life to them* to create an engaging story.
   [""] // blank line
   [getStoryPrefixData(window.continueMode)]
-  // [startWithPrefix]  // see the `startWithPrefix = ...` above line, which includes the 'writing style' input.
-  (write story continuation here, but don't railroad the player into a predefined story, and don't make choices for them)
   # Ambient Outro (One or two non-repetitive details of outside environment, distant sounds, scents, tangential callbacks, etc.): // Note: we use "# Ambient Outro" as a stop sequence, so this "# Ambient Outro" line and the stuff below never gets written. This is a galaxy brain trick to prevent the AI from including anything other than consequences in the response. Otherwise it sometimes includes other stuff even in spite of instructions to the contrary.
   (a short ambient environmental/outside outro to round off the above paragraph)
   $output = [this.joinItems("\n").trim()]
@@ -1523,7 +1521,7 @@ async downloadStory(id) =>
   if(filename === null) return;
   filename = filename.trim() || "story";
   const suffix = localStorage.saveFileSuffix || "pfstory";
-  if (localStorage.saveFileTimestamp.checked !== "1") {
+  if (localStorage.saveFileTimestamp !== "1") {
     const now = new Date();
     const timestamp = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
     filename += `_${timestamp}`;
