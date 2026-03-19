@@ -150,7 +150,6 @@
   };
 </script>
 
-
 <script>window.pageLoadStartTime=Date.now();</script>
 <script>window.onForcedColorSchemeChangeHandlers = new Set();</script> 
 
@@ -486,7 +485,7 @@ if(localStorage.seenTopStuffOnce) {
       <div class="storySettingsModalTitleRow">
         <div style="font-weight:bold;">Story Settings</div>
       </div>
-      <button class="modalCloseBtn" onclick="closeStorySettingsModal()" title="Close">✕</button>
+      <button class="modalCloseBtn" onclick="closeStorySettingsModal()" title="Close">✕</button> <!--Story Settings-->
     </div>
     <div class="modalRow modalSectionRow"> <!--Perspective / Difficulty-->
       <div class="modalSection modalSectionHalf">
@@ -727,6 +726,33 @@ if(localStorage.seenTopStuffOnce) {
         </div>
         <div  style="text-align:left; font-size:80%;">This will allow Em/En dashes in the story.</div>
       </div>
+    </div>
+    <div class="modalHeader"> <!--Global Setting-->
+      <div class="storySettingsModalTitleRow">
+        <div style="font-weight:bold;">Global Settings</div>
+      </div>
+    </div>
+    <div class="modalRow modalSectionRow"> <!--Naming Scheme / Formatting-->
+      <div class="modalSection modalSectionHalf"> <!--Save File Timestamp-->
+        <div class="modalSectionTitle">Save File Timestamp</div>
+          <div class="modalRow themeInlineRow">
+          <div class="modalRow" style="align-items:center; gap:0.35rem;  align-items:center;">
+            <label><input id="saveFileTimestampEl" oninput="localStorage.saveFileTimestamp=this.checked ? '1' : '';" type="checkbox"> Disable Timestamp</label>  
+          </div>
+        </div>
+        <div  style="text-align:left; font-size:80%;">Removes timestamp from save files</div>
+      </div>
+      <div class="modalSection modalSectionHalf"> <!--Save File Suffix-->
+        <div class="modalSectionTitle">Save File Suffix</div>
+          <div class="modalRow themeInlineRow">
+          <div class="modalRow" style="align-items:center; gap:0.35rem;  align-items:center; margin-top:0;">
+            <input id="saveFileSuffixEl" oninput="localStorage.saveFileSuffix=this.value" placeholder="pfstory (default)">
+          </div>
+        </div>
+        <div  style="text-align:left; font-size:80%;">Example: StoryName.pfstory.json</div>
+      </div>
+    </div>
+
     </div>
   </div>
 </div>

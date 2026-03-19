@@ -797,6 +797,8 @@ getCurrentStoryDataForStorage() =>
     storyArcInstruction: storyArcInstructionEl.value,
     emDashesComfirmation: localStorage.emDashesComfirmation || "",
     shortcutButtons: JSON.parse(localStorage.shortcutButtons || "[]"),
+    saveFileTimestamp: !!localStorage.saveFileTimestamp.checked,
+    saveFileSuffix: localStorage.saveFileSuffix || "",
   });
 
 getSuggestedTitleFromStoryData(data) =>
@@ -1520,9 +1522,13 @@ async downloadStory(id) =>
   let filename = prompt("Choose a filename:", (entry.title || "story").trim().slice(0, 60) || "story");
   if(filename === null) return;
   filename = filename.trim() || "story";
-  const now = new Date();
-  const timestamp = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
-  filename += `_${timestamp}.pfstory.json`;
+  const suffix = localStorage.saveFileSuffix || "pfstory";
+  if (localStorage.saveFileTimestap === "1") {
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
+    filename += `_${timestamp}`;
+  }
+  filename += `.${suffix}.json`;
   let blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   let url = URL.createObjectURL(blob);
   let a = document.createElement('a');
@@ -2924,6 +2930,8 @@ loadChatDataIntoInputAreas(data) =>
   storyGameModeSelectEl.value = data.gameMode || "";
   storyNamingConventionSelectEl.value = data.storyNamingConventionSelect || "";
   storyDashesCheckbox.checked = data.storyDashesEnabled || "";
+  saveFileTimestampEl.checked = localStorage.saveFileTimestamp || "";
+  saveFileSuffixEl.value = localStorage.saveFileSuffix || "";
   localStorage.storyBibleAutoCheckbox_PlayerInfo = data.storyBibleAuto_PlayerInfo || "";
   localStorage.storyBibleAutoCheckbox_OtherCharacters = data.storyBibleAuto_OtherCharacters || "";
   localStorage.storyBibleAutoCheckbox_Locations = data.storyBibleAuto_Locations || "";
