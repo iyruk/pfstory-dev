@@ -1,5 +1,3 @@
-# pfstory changelog
-
 ## 2026.03.19
 Features:
 - Added Global Settings for Save file (by request)
