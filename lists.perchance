@@ -3215,7 +3215,7 @@ getCurrentStoryData() =>
     currentTrackedInfo: currentTrackedInfoEl.value,
     infoTrackingEnabled: infoTrackingBtn.dataset.enabled,
     gameMode: storyGameModeSelectEl.value,
-    storyNamingConventionSelectL: storyNamingConventionSelectEl.value,
+    storyNamingConventionSelect: storyNamingConventionSelectEl.value,
     storyDashesEnabled: storyDashesCheckbox.checked,    
     storyBibleAuto_PlayerInfo: localStorage.storyBibleAutoCheckbox_PlayerInfo,
     storyBibleAuto_OtherCharacters: localStorage.storyBibleAutoCheckbox_OtherCharacters,
