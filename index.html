@@ -610,6 +610,7 @@ if(localStorage.seenTopStuffOnce) {
               <option value="fantasy">Fantasy</option>
               <option value="historical_fiction">Historical Fiction</option>
               <option value="horror">Horror</option>
+              <option value="magic_real">Magical Realism</option>
               <option value="mystery">Mystery</option>
               <option value="noir">Noir</option>
               <option value="political">Political</option>
@@ -643,6 +644,7 @@ if(localStorage.seenTopStuffOnce) {
               <option value="fantasy">Fantasy</option>
               <option value="historical_fiction">Historical Fiction</option>
               <option value="horror">Horror</option>
+              <option value="magic_real">Magical Realism</option>
               <option value="mystery">Mystery</option>
               <option value="noir">Noir</option>
               <option value="political">Political</option>
@@ -1551,6 +1553,8 @@ if(localStorage.seenTopStuffOnce) {
     <button id="shareStoryBtn" onclick="openShareModal()" title="Save as sharable link" style="width:max-content; height:min-content;">🔗 Share</button>
     <button onclick="if(mediaSettingsBar.style.display === 'none') { mediaSettingsBar.style.display=''; this.textContent='🎵 Hide Music'; } else { mediaSettingsBar.style.display='none'; this.textContent='🎵 Show Music'; }">🎵 Show Music</button>
     <button onclick="if(genInfoCtn.style.display === 'none') { genInfoCtn.style.display=''; this.textContent='ℹ️ Hide Info'; } else { genInfoCtn.style.display='none'; this.textContent='ℹ️ Show Info'; }">ℹ️ Show Info</button>
+    <button onclick="if(autoBackupsOuterEl.hidden === true) { autoBackupsOuterEl.hidden=false; this.textContent='🗄️ Hide Backups'; } else { autoBackupsOuterEl.hidden=true; this.textContent='🗄️ Show Backups'; }">🗄️ Show Backups</button>
+    <button onclick="if(commentsEl.style.display == 'none') { if(!commentsEl.innerHTML.trim()){initTabbedComments();}; commentsEl.style.display=''; this.textContent='Hide Comments'; } else { commentsEl.style.display='none'; this.textContent='💬 Show Comments'; }">💬 Show Comments</button>
     <button id="storySettingsBtn" onclick="openStorySettingsModal()"">⚙️ Settings</button>
   </div>
   <script>
@@ -1830,10 +1834,10 @@ window.addEventListener("beforeunload", function() {
       window.lastRenderedAutoBackupsArray = autoBackupsArray;
       let html = autoBackupsArray.slice(0, opts.maxItems||999999).map((d, i) => `<li style="list-style-type:none; margin-top:${i===0 ? 0 : 0.25}rem; font-size:80%;"><button onclick="window.loadAutoBackupClickHandler(${i})" style="margin-right:0.25rem;">📦 load</button><span>${new Date(d.creationTime).toString().split(" ").slice(1, 5).join(" ").replace(/:[0-9][0-9]$/, "").replace(` ${new Date().getFullYear()} `, " ")}</span> (<b>browser storage</b>)</li>`).join("");
       autoBackupsListCtn.innerHTML = html;
-      autoBackupsOuterEl.hidden = false;
+      // autoBackupsOuterEl.hidden = false;
     } else {
       autoBackupsListCtn.innerHTML = "";
-      autoBackupsOuterEl.hidden = true;
+      // autoBackupsOuterEl.hidden = true;
     }
   }
   window.renderAutoBackupsList = renderAutoBackupsList;
@@ -1976,42 +1980,102 @@ setInterval(async () => {
   </div>
 </div>
 
-<div id="genInfoCtn">
-  <ul style="font-size:80%; max-width:640px; margin:1rem auto; margin-top:2rem; padding-bottom:0.5rem; padding-left:1.125rem; padding-right:0.25rem; background:var(--bg-overlay); border:1px solid var(--box-border-color); border-radius:3px;">
-    <li style="margin-top:0.5rem;">This generator was created/modified by <b>@iyruk.</b></br>It is based off ai-rpg, with several enhancements to create better stories.</br>Various Story settings are saved under Settings, you can also modify the story theme.</li>
-    <li>Features:</br>
-      - Stories Manager (Create and manage multiple stories without have to export/import.)</br>
-      - Story Bible (An ehanced Info Tracker with AI generation to extend Memory and act as a lorebook)</br>
-      -- Auto Updates (Enable to update section automatically)
-      - Theme Settings (Customize the look with various colors and options to configure the story to your preference.)</br>
-      - Story Settings (Advanced Story settings to allow for in depth tailoring for each story)</br>
-      -- Perspective</br>
-      -- Difficulty</br>
-      -- Writing Style</br>
-      -- Writing Length</br>
-      -- Genre/Sub-Genre (Adjusts the overall feel and atmosphere of the story/game)</br>
-      -- Game Mode ("Game" will provide you with interactable objects more often)</br>
-      -- Dice Roll (Ability to affect outcome of story/game based on roll)</br>
-      -- Formatting</br>
-    </li>
-    <li style="margin-top:0.5rem;">Once you begin your story, you can <b>manually edit</b> the text by just tapping in the text box, and this is a good way to control the AI's writing style, since it'll tend to follow the writing style of the previous text.</li>
-    <li style="margin-top:0.5rem;">If you scroll up in the story once it has become long, you'll see that some special summary paragraphs have been inserted. Feel free to edit the content of these summaries, but don't move or delete them. <b>They help extend the AI's memory</b>. If you want to easily get the full story text without the summary paragraphs, you can click this button: <button id="copyStoryTextWithoutSummariesBtn" onclick="copyStoryTextToClipboardWithoutSummaries()">📋 copy story (no summaries)</button></li>
-    <li style="margin-top:0.5rem;">This page uses your browser/device storage to <b>remember your stories even after you refresh the page</b>. Your stories are <b style="color:#e98721;">not</b> stored on a server. They're stored privately in your browser/device storage only. <b>Download/backup your stories often</b> using the 💾 save button.</li>
-    <li style="margin-top:0.5rem;">The <a href="https://perchance.org/ai-character-description" target="_blank">AI Character Description</a> generator may come in handy.</li>
-    <li style="margin-top:0.5rem;">The <a href="https://perchance.org/ai-story-outline" target="_blank">AI Story Outline Generator</a> and <a href="https://perchance.org/ai-plot-generator" target="_blank">AI Plot Generator</a> may come in handy if you're out of ideas.</li>
-    <li style="margin-top:0.5rem;">And the <a href="https://perchance.org/ai-text-to-image-generator" target="_blank">AI Image Generator</a> to create images for characters/scenes/etc.</li>
-    <li style="margin-top:0.5rem;">Maybe also try the <a href="https://perchance.org/ai-generated-hierarchical-world" target="_blank">Hierarchical World Generator</a> if you need to brainstorm world building ideas.</li>
-    <li style="margin-top:0.5rem;">Want to play around <i>"inside"</i> your story's world? Try <a href="/ai-rpg" target="_blank" style="font-weight:bold; color:#2bbb00;">AI RPG</a>.</li>
-    <li style="margin-top:0.5rem;">Prefer a chat/RP-style interface? Try the simple <a href="https://perchance.org/ai-chat" target="_blank">AI Chat</a> page, or the more advanced <a href="https://perchance.org/ai-character-chat" target="_blank">AI Character Chat</a> which can generate images within the chat.</li>
-    <li style="margin-top:0.5rem;">Want your story <b>read aloud</b> with nice background music and pictures? <a href="https://perchance.org/ai-bedtime-story" target="_blank">AI Bedtime Story</a> might be for you.</li>
-    <li style="margin-top:0.5rem;">If a generated paragraph is particularly bad or particularly good, please rate it with the thumbs up/down buttons to help improve the AI.</li>
-    <li style="margin-top:0.5rem;">This generator is powered by the <a href="https://perchance.org/ai-text-plugin" target="_blank">ai-text-plugin</a>.</li>
-  </ul>
+<!-- INFO STUFF -->
+<div id="genInfoCtn" style="display:none;">
+  <div class="tabs">
+    <!-- Radio inputs must precede labels + panels in DOM -->
+    <input type="radio" name="tabs" id="tab-about" checked>
+    <input type="radio" name="tabs" id="tab-res">
+    <input type="radio" name="tabs" id="tab-log">
+   
+    <div class="tab-labels">
+      <label for="tab-about">About</label>
+      <label for="tab-res">Resources</label>
+      <label for="tab-log">Changelog</label>
+    </div>
+   
+    <div class="tab-panels">
+   
+      <!-- ── About ── -->
+      <div class="tab-panel" id="panel-about">
+        <p class="byline">Created/modified by <b>@iyruk</b>. Based on <em>ai-rpg</em>, with several enhancements for better story generation.</p>
+   
+        <h4>Features</h4>
+        <ul>
+          <li><b>Stories Manager</b> - Create and manage multiple stories without exporting or importing.</li>
+          <li><b>Story Bible</b> - An enhanced Info Tracker with AI generation to extend Memory and act as a lorebook.
+            <ul>
+              <li>Auto Updates - enable to update sections automatically.</li>
+            </ul>
+          </li>
+          <li><b>Theme Settings</b> - Customize the look with various colors and options per story.</li>
+          <li><b>Story Settings</b> - Advanced per-story settings:
+            <ul>
+              <li>Perspective, Difficulty, Writing Style, Writing Length</li>
+              <li>Genre / Sub-Genre - adjusts the overall feel and atmosphere.</li>
+              <li>Game Mode - "Game" mode provides interactable objects more often.</li>
+              <li>Dice Roll - affect story outcomes based on the roll.</li>
+              <li>Naming Conventions - Guides AI to name new characters based on the selection</li>
+              <li>Formatting options.</li>
+            </ul>
+          </li>
+          <li><b>Global Settings:</b>
+            <ul>
+              <li>Save File Options</li>
+            </ul>
+          </li>
+        </ul>
+        <h4>Notes</h4>
+        <ul>
+          <li>Once your story has started, <b>tap the text box to manually edit it</b>. The AI tends to follow the style of preceding text — a handy way to steer its writing.</li>
+          <li>As your story grows, special summary paragraphs are inserted when you scroll up. Feel free to edit them, but don't move or delete them — <b>they help extend the AI's memory</b>. To copy the story without summaries, use the <button class="inline-btn" id="copyStoryTextWithoutSummariesBtn" onclick="copyStoryTextToClipboardWithoutSummaries()">📋 copy story (no summaries)</button> button.</li>
+          <li>Stories are saved in <b>your browser/device storage</b> — <span class="warn">not</span> on any server. Back them up regularly with the <button class="inline-btn">💾 save</button> button.</li>
+        </ul>
+      </div>
+   
+      <!-- ── Resources ── -->
+      <div class="tab-panel" id="panel-res">
+        <h4>Useful Generators</h4>
+        <ul>
+          <li><a href="https://perchance.org/ai-character-description" target="_blank">AI Character Description</a> — handy for fleshing out characters.</li>
+          <li><a href="https://perchance.org/ai-story-outline" target="_blank">AI Story Outline Generator</a> and <a href="https://perchance.org/ai-plot-generator" target="_blank">AI Plot Generator</a> — great when you're out of ideas.</li>
+          <li><a href="https://perchance.org/ai-text-to-image-generator" target="_blank">AI Image Generator</a> — create visuals for characters, scenes, and more.</li>
+          <li><a href="https://perchance.org/ai-generated-hierarchical-world" target="_blank">Hierarchical World Generator</a> — for brainstorming world-building ideas.</li>
+          <li><a href="/ai-rpg" target="_blank"><b>AI RPG</b></a> — explore <em>inside</em> your story's world.</li>
+          <li><a href="https://perchance.org/ai-chat" target="_blank">AI Chat</a> or the more advanced <a href="https://perchance.org/ai-character-chat" target="_blank">AI Character Chat</a> (can generate images within chat) — for a chat/RP-style interface.</li>
+          <li><a href="https://perchance.org/ai-bedtime-story" target="_blank">AI Bedtime Story</a> — your story read aloud with background music and pictures.</li>
+        </ul>
+   
+        <h4>Tips</h4>
+        <ul>
+          <li>If a generated paragraph is especially good or bad, rate it with the <b>👍 / 👎 buttons</b> to help improve the AI.</li>
+          <li>This generator is powered by the <a href="https://perchance.org/ai-text-plugin" target="_blank">ai-text-plugin</a>.</li>
+        </ul>
+      </div>
+   
+      <!-- ── Changelog ── -->
+      <div class="tab-panel" id="panel-log">
+        <p id="changelogContent" class="changelog-empty">No changelog entries yet.</p>
+      </div>
+   
+    </div><!-- /tab-panels -->
+  </div><!-- /tabs -->
 </div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script>
+  const url = "https://raw.githubusercontent.com/iyruk/pfstory-dev/main/changelog.md";
+
+  fetch(url)
+    .then(res => res.text())
+    .then(md => {
+      // Convert Markdown to HTML
+      document.getElementById("changelogContent").innerHTML = marked.parse(md);
+    });
+</script>
 
 <!-- COMMENTS STUFF -->
 <div id="commentsCtn">
-<p><button onclick="if(commentsEl.style.display == 'none') { if(!commentsEl.innerHTML.trim()){initTabbedComments();}; commentsEl.style.display=''; this.textContent='Hide Comments'; } else { commentsEl.style.display='none'; this.textContent='💬 Show Comments'; }">💬 Show Comments</button></p>
 <p id="commentsEl" style="display:none;"></p>
 </div>
 <script>
@@ -2151,1015 +2215,1242 @@ else ai({preload:true});
 
 <!-- STYLE/DESIGN -->
 <style>
-
-/* Global Variables */
-:root {
-  --bg:           #0a0711;
-  --bg-surface:   #14111C; 
-  --bg-overlay:   #2A2830;
-  --bg-hover:     #2D2240;
-  --bg-story:     #000000;
-  --bg-global:    #000000;
-  --border:       rgba(118,117,137,0.07);
-  --border-mid:   rgba(118,117,137,0.11);
-  --border-focus: rgba(173,166,202,0.55);
-  --text:         #d8d2c8;
-  --text-dim:     #7a7670;
-  --text-muted:   #4a4843;
-  --accent:       #ada9bb;
-  --accent-dim:   rgba(69,65,79,0.50);
-  --accent-glow:  rgba(196,160,96,0.06);
-  --danger:       #b05050;
-  --info:         #4374cd;
-  --success:      #3d7a5e;
-
-  --radius-sm:    5px;
-  --radius:       8px;
-  --radius-lg:    12px;
-  --radius-pill:  100px;
-
-  --font-ui:      'DM Sans', system-ui, sans-serif;
-  --font-story:   'Cormorant Garamond', Georgia, serif;
-
-  --transition:   140ms ease;
-
-  --drawer-width: 320px;
-  --notepad-width: 320px;
-}
-
-[data-scheme="light"] {
-  --bg:           #f5f2ec;
-  --bg-surface:   #faf8f5;
-  --bg-overlay:   #ffffff;
-  --bg-hover:     #eae5f1;  
-  --bg-story:     #fafafa;
-  --bg-global:    #fafafa;
-  --border:       rgba(0,0,0,0.08);
-  --border-mid:   rgba(0,0,0,0.13);
-  --border-focus: rgba(160,120,40,0.5);
-  --text:         #2c2820;
-  --text-dim:     #7a7060;
-  --text-muted:   #b8b0a0;
-  --accent:       #a07830;
-  --accent-dim:   rgba(160,120,40,0.12);
-  --accent-glow:  rgba(160,120,40,0.04);
-  --danger:       #a03030;
-}
-
-/* Base */
-
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  height: 100%;
-}
-
-body {
-  font-family: var(--font-ui);
-  font-size: 14px;
-  line-height: 1.6;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100dvh;
-  -webkit-font-smoothing: antialiased;
-}
   
-/* Buttons */
-
-button {
-  font-family: var(--font-ui);
-  font-size: 12.5px;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  color: var(--text);
-  background: var(--bg-overlay);
-  border: 1px solid var(--border-mid);
-  border-radius: var(--radius);
-  padding: 0.4rem 0.8rem;
-  cursor: pointer;
-  transition: background var(--transition), border-color var(--transition), color var(--transition), opacity var(--transition);
-  line-height: 1.4;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  white-space: nowrap;
-  user-select: none;
-}
-.btn:not(.no-hover):hover {
-  background: var(--bg-hover);
-  border-color: var(--border-mid);
-}
-.btn:active {
-  opacity: 0.75;
-}
-.btn:disabled {
-  opacity: 0.3;  
-  cursor: not-allowed;
-}
-.btn:focus-visible {
-  outline: 1.5px solid var(--accent);
-  outline-offset: 2px;
-}
+  /* Global Variables */
+  :root {
+    --bg:           #0a0711;
+    --bg-surface:   #14111C; 
+    --bg-overlay:   #2A2830;
+    --bg-hover:     #2D2240;
+    --bg-story:     #000000;
+    --bg-global:    #000000;
+    --border:       rgba(118,117,137,0.07);
+    --border-mid:   rgba(118,117,137,0.11);
+    --border-focus: rgba(173,166,202,0.55);
+    --text:         #d8d2c8;
+    --text-dim:     #7a7670;
+    --text-muted:   #4a4843;
+    --accent:       #ada9bb;
+    --accent-dim:   rgba(69,65,79,0.50);
+    --accent-glow:  rgba(196,160,96,0.06);
+    --danger:       #b05050;
+    --warn:         #e98721;
+    --info:         #4374cd;
+    --success:      #3d7a5e;
   
-.btn-alt {
-  background: transparent;
-  border-color: transparent;
-  color: var(--text-dim);
-  padding: 0.35rem 0.55rem;
-}
-.btn-alt:hover {
-  background: var(--bg-overlay);
-  color: var(--text);
-  border-color: var(--border);
-}
-
-.btn-icon {
-  padding: 0.4rem;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius);
-  justify-content: center;
-}
-
-.btn-danger {
-  color: var(--danger);
-  border-color: transparent;
-  background: transparent;
-}
-.btn-danger:hover {
-  background: rgba(176,80,80,0.12);
-  border-color: rgba(176,80,80,0.25);
-}
-
-.btn-action {
-  background: var(--bg-surface);
-  border-color: rgba(196,160,96,0.35);
-  color: var(--accent);
-  font-weight: 500;
-  font-size: 15px;
-  padding: 0.7rem 2rem;
-  border-radius: var(--radius-pill);
-  letter-spacing: 0.03em;
-}
-
-/* Global Inputs & Textareas */
-input, textarea, select, #notepadEditorEl {
-  font-family: var(--font-ui);
-  font-size: 13px;
-  color: var(--text);
-  background: var(--bg-global);
-  border: 1px solid var(--border-mid);
-  border-radius: var(--radius);
-  padding: 0.5rem 0.65rem;
-  transition: border-color var(--transition), background var(--transition);
-  outline: none;
-  /* width: 100%; */
-  line-height: 1.5;
-}
-
-#storySoFarEl {
-  font-family: var(--font-ui);
-  font-size: 1.0rem;
-  color: var(--text);
-  background: var(--bg-story);
-  border: 1px solid var(--border-mid);
-  border-radius: var(--radius);
-  transition: border-color var(--transition), background var(--transition);
-  outline: none;
-  min-width: 100%;
-  width: 100%;
-  line-height: 1.5;
-}
+    --radius-sm:    5px;
+    --radius:       8px;
+    --radius-lg:    12px;
+    --radius-pill:  100px;
   
-select.no-full-width, input.no-full-width {
-  width: auto;
-}
-input:focus, textarea:focus, select:focus {
-  border-color: var(--border-focus);
-  background: var(--bg-surface);
-}
-input::placeholder, textarea::placeholder {
-  color: var(--text-muted);
-}
-
-/* Header Bar */
-#storyHeaderBar {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.6rem 0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: linear-gradient(to bottom, var(--bg) 80%, transparent);
-}
-
-/* Overview Textarea */
-#storyOverviewEl {
-  min-height: 7rem;
-  margin-bottom: 0.75rem;
-  font-size: 13.5px;
-  line-height: 1.65;
-  min-width: 100%;
-  width: 100%;
-}
-
-.header-left, .header-right {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-#storyTitleCtn {
-  flex: 1;
-  max-width: max-content;
-  text-align: center;
-  font-size: 12.5px;
-  color: var(--text);
-  /* background-color: var(--bg-surface); */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.3rem;
-  min-width: 0;
-  overflow: hidden;
-}
-
-/* Stories Drawer */
-#storiesDrawerOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(2px);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 160ms ease;
-  z-index: 9999990;
-}
-#storiesDrawer {
-  position: fixed;
-  top: 0; left: 0;
-  height: 100dvh;
-  width: min(var(--drawer-width), 88vw);
-  background: var(--bg-surface);
-  border-right: 1px solid var(--border);
-  box-shadow: 4px 0 32px rgba(0,0,0,0.45);
-  transform: translateX(-105%);
-  transition: transform 180ms cubic-bezier(0.22,0.61,0.36,1);
-  z-index: 9999991;
-  display: flex;
-  flex-direction: column;
-}  
-body.storiesDrawerOpen #storiesDrawerOverlay { opacity: 1; pointer-events: auto; }
-body.storiesDrawerOpen #storiesDrawer { transform: translateX(0); }
-.storiesDrawerHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 0.85rem;
-  border-bottom: 1px solid var(--border);
-  font-size: 13px;
-  font-weight: 500;
-}
-.storiesDrawerSearch {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.5rem 0.65rem;
-  border-bottom: 1px solid var(--border);
-}
-.storiesListCtn {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0.4rem;
-}
-.storiesDrawerSearch input {
-  font-size: 12.5px;
-  padding: 0.35rem 0.55rem;
-  background: var(--bg-overlay);
-}
-.storyRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.35rem;
-  padding: 0.4rem 0.5rem;
-  border-radius: var(--radius);
-  border: 1px solid transparent;
-  margin: 2px 0;
-  transition: background var(--transition);
-}
-.storyRow:hover { background: var(--bg-hover); }
-.storyRow.current { border-color: rgba(118,117,137,0.25); background: var(--accent-dim); }
-.storyPickBtn {
-  flex: 1;
-  text-align: left;
-  background: transparent;
-  border: none;
-  color: inherit;
-  padding: 0.2rem 0.2rem;
-  font-size: 12.5px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.storyTime {
-  font-size: 10.5px;
-  color: var(--text-dim);
-  white-space: nowrap;
-}
-.storyMenuBtn {
-  background: transparent;
-  border: none;
-  padding: 0.2rem 0.35rem;
-  color: var(--text-dim);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  cursor: pointer;
-}
-.storyMenuBtn:hover { background: var(--bg-hover); color: var(--text); }
-.storiesDrawerFooter {
-  border-top: 1px solid var(--border);
-  padding: 0.5rem 0.65rem;
-  padding-top: 0rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-.storiesDrawerFooterActions {
-  display: flex;
-  gap: 0.35rem;
-}
-.storiesDrawerFooterActions button {
-  flex: 1;
-  justify-content: center;
-  font-size: 11.5px;
-  padding: 0.35rem 0.5rem;
-  background: transparent;
-  border-color: var(--border-mid);
-}
-
-/* Story Menu */
-.storyMenuEl {
-  position: fixed;
-  z-index: 9999993;
-  background: var(--bg-overlay);
-  border: 1px solid var(--border-mid);
-  box-shadow: 0 8px 28px rgba(0,0,0,0.4);
-  border-radius: var(--radius);
-  padding: 0.3rem;
-  min-width: 160px;  
-  overflow: hidden;
-}
-.storyMenuEl button, .storyToolsMenu button {
-  display: block;
-  width: 100%;
-  text-align: left;
-  background: transparent;
-  border: none;
-  padding: 0.4rem 0.65rem;
-  font-size: 12.5px;
-  color: var(--text);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-}
-.storyMenuEl button:hover, .storyToolsMenu button:hover {
-  background: var(--bg-hover);
-}
-.storyToolsDivider {
-  height: 1px;
-  border: 0;
-  background: var(--border);
-  margin: 0.25rem;
-}
-/* Modal System */
-.modalOverlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999998;
-  display: grid;
-  place-items: center;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(4px);
-}
-.modalBox {
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--border-mid);
-  border-radius: var(--radius-lg);
-  padding: 1.25rem;
-  width: min(92vw, 520px);
-  max-height: 85vh;
-  overflow: auto;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-}
-.modalBox select {
-  background: var(--bg-overlay);
-}
-.modalHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1.25rem;
-  font-size: 14px;
-  font-weight: 500;
-}
-.modalCloseBtn {
-  background: transparent;
-  border: none;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius);
-  color: var(--text-dim);
-  font-size: 1.0rem;;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0;
-}
-.modalCloseBtn:hover { background: var(--bg-hover); color: var(--text); }
-.modalSection {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 0.75rem 0.75rem;
-  position: relative;
-  margin-bottom: 0.85rem;
-}
-.modalSectionTitle {
-  position: absolute;
-  top: -0.5rem;
-  left: 0.65rem;
-  background: var(--bg);
-  padding: 0 0.3rem;
-  font-size: 10.5px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  font-weight: 500;
-}
-.modalActions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.35rem;
-  margin-top: 0.5rem;
-}
-.modalActions .btn-primary {
-  font-size: 13px;
-  padding: 0.45rem 1rem;
-}
-
-/* Notepad Panel */
-#notepadPanel {
-  position: fixed;
-  top: 0; right: 0;
-  min-width: 310px;
-  width: var(--notepad-width);
-  height: 100dvh;
-  background: var(--bg-surface);
-  border-left: 1px solid var(--border);
-  box-shadow: -4px 0 24px rgba(0,0,0,0.3);
-  transform: translateX(100%);
-  transition: transform 180ms cubic-bezier(0.22,0.61,0.36,1);
-  z-index: 9999960;
-  display: flex;
-  flex-direction: column;
-  padding: 0.75rem;
-  gap: 0.5rem;
-}
-.notepadHeader {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.notepadHeader select {  
-  background: var(--bg-overlay);
-  flex: 1;
-  min-width: 0;
-}
-.notepadTabsRow {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-#notepadEditorEl, .notepadTabsRow select {  
-  background: var(--bg-overlay);
-}
-
-/* Begin Screen */
-#storyBeginBtn {
-  background: var(--accent-glow);
-  border-color: rgba(196,160,96,0.35);
-  color: var(--accent);
-  font-weight: 500;
-  font-size: 15px;
-  padding: 0.7rem 2rem;
-  border-radius: var(--radius-pill);
-  letter-spacing: 0.03em;
-}
-
-
-/* Story Area */
-#storyGenerationAreaEl {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content:center;
-  align-items: center;
-  width: 100%;
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
-  /* gap: 0.5rem; */
-}
-
-#themeBtn, #storyToolsBtn{
-  font-size: 0.8rem;
-  padding: 0.25rem 0.55rem;
-  border-radius: var(--radius-pill);
-  color: var(--text-dim);
-  background: var(--bg-surface);
-  border-color: var(--border);
-  letter-spacing: 0.01em;
-}
-#toggleOverviewVisibilityBtn {
-  font-size: 0.8rem;
-  padding: 0.25rem 0.55rem;
-  border-radius: var(--radius-pill);
-  color: var(--text-dim);
-  background: var(--bg-overlay);
-  border-color: var(--border);
-  letter-spacing: 0.01em;
-}
-.storyToolsMenu {
-  position: absolute;
-  right: 0.5rem;
-  top: -0.5rem;
-  transform: translateY(1.25rem);
-  background: var(--bg-overlay);
-  border: 1px solid var(--box-border-color);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-  border-radius: 6px;
-  padding: 0.25rem 0;
-  min-width: 210px;
-  z-index: 5;
-}
-
-/* Story Actions */
-#bottomButtonsCtn {
-  width: max-content;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-  font-size: 11.5px;
-}
-
-#rateLastMessageBadBtn, #rateLastMessageGoodBtn {
-  font-size: 11.5px;
-  padding: 0.3rem 0.7rem;
-  color: var(--text-dim);
-  border-color: var(--border);
-  border-radius: var(--radius-pill);
-}
-
-.settingsModule {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.4rem 0.65rem;
-  font-size: 12.5px;
-}
-
-#autoBackupsCtn {
-  display: inline-block;   /* shrink to content */
-  background: var(--bg-surface);
-  border: 1px solid var(--border);  
-  border-radius: var(--radius);
-  padding: 1rem;
-}
-
-#autoBackupsOuterEl {
-  text-align: center;      /* center the inline-block */
-}
-
+    --font-ui:      'DM Sans', system-ui, sans-serif;
+    --font-story:   'Cormorant Garamond', Georgia, serif;
+  
+    --transition:   140ms ease;
+  
+    --drawer-width: 320px;
+    --notepad-width: 320px;
+  }
+  
+  [data-scheme="light"] {
+    --bg:           #f5f2ec;
+    --bg-surface:   #faf8f5;
+    --bg-overlay:   #ffffff;
+    --bg-hover:     #eae5f1;  
+    --bg-story:     #fafafa;
+    --bg-global:    #fafafa;
+    --border:       rgba(0,0,0,0.08);
+    --border-mid:   rgba(0,0,0,0.13);
+    --border-focus: rgba(160,120,40,0.5);
+    --text:         #2c2820;
+    --text-dim:     #7a7060;
+    --text-muted:   #b8b0a0;
+    --accent:       #a07830;
+    --accent-dim:   rgba(160,120,40,0.12);
+    --accent-glow:  rgba(160,120,40,0.04);
+    --danger:       #a03030;
+  }
+  
+  /* Base */
+  
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  html {
+    height: 100%;
+  }
+  
+  body {
+    font-family: var(--font-ui);
+    font-size: 14px;
+    line-height: 1.6;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+  }
+    
+  /* Buttons */
+  
+  button {
+    font-family: var(--font-ui);
+    font-size: 12.5px;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    color: var(--text);
+    background: var(--bg-overlay);
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius);
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    transition: background var(--transition), border-color var(--transition), color var(--transition), opacity var(--transition);
+    line-height: 1.4;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .btn:not(.no-hover):hover {
+    background: var(--bg-hover);
+    border-color: var(--border-mid);
+  }
+  .btn:active {
+    opacity: 0.75;
+  }
+  .btn:disabled {
+    opacity: 0.3;  
+    cursor: not-allowed;
+  }
+  .btn:focus-visible {
+    outline: 1.5px solid var(--accent);
+    outline-offset: 2px;
+  }
+    
+  .btn-alt {
+    background: transparent;
+    border-color: transparent;
+    color: var(--text-dim);
+    padding: 0.35rem 0.55rem;
+  }
+  .btn-alt:hover {
+    background: var(--bg-overlay);
+    color: var(--text);
+    border-color: var(--border);
+  }
+  
+  .btn-icon {
+    padding: 0.4rem;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius);
+    justify-content: center;
+  }
+  
+  .btn-danger {
+    color: var(--danger);
+    border-color: transparent;
+    background: transparent;
+  }
+  .btn-danger:hover {
+    background: rgba(176,80,80,0.12);
+    border-color: rgba(176,80,80,0.25);
+  }
+  
+  .btn-action {
+    background: var(--bg-surface);
+    border-color: rgba(196,160,96,0.35);
+    color: var(--accent);
+    font-weight: 500;
+    font-size: 15px;
+    padding: 0.7rem 2rem;
+    border-radius: var(--radius-pill);
+    letter-spacing: 0.03em;
+  }
+  
+  /* Global Inputs & Textareas */
+  input, textarea, select, #notepadEditorEl {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: var(--text);
+    background: var(--bg-global);
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius);
+    padding: 0.5rem 0.65rem;
+    transition: border-color var(--transition), background var(--transition);
+    outline: none;
+    /* width: 100%; */
+    line-height: 1.5;
+  }
+  
+  #storySoFarEl {
+    font-family: var(--font-ui);
+    font-size: 1.0rem;
+    color: var(--text);
+    background: var(--bg-story);
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius);
+    transition: border-color var(--transition), background var(--transition);
+    outline: none;
+    min-width: 100%;
+    width: 100%;
+    line-height: 1.5;
+  }
+    
+  select.no-full-width, input.no-full-width {
+    width: auto;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--border-focus);
+    background: var(--bg-surface);
+  }
+  input::placeholder, textarea::placeholder {
+    color: var(--text-muted);
+  }
+  
+  /* Header Bar */
+  #storyHeaderBar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.6rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+  }
+  
+  /* Overview Textarea */
+  #storyOverviewEl {
+    min-height: 7rem;
+    margin-bottom: 0.75rem;
+    font-size: 13.5px;
+    line-height: 1.65;
+    min-width: 100%;
+    width: 100%;
+  }
+  
+  .header-left, .header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  #storyTitleCtn {
+    flex: 1;
+    max-width: max-content;
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--text);
+    /* background-color: var(--bg-surface); */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    min-width: 0;
+    overflow: hidden;
+  }
+  
+  /* Stories Drawer */
+  #storiesDrawerOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 160ms ease;
+    z-index: 9999990;
+  }
+  #storiesDrawer {
+    position: fixed;
+    top: 0; left: 0;
+    height: 100dvh;
+    width: min(var(--drawer-width), 88vw);
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border);
+    box-shadow: 4px 0 32px rgba(0,0,0,0.45);
+    transform: translateX(-105%);
+    transition: transform 180ms cubic-bezier(0.22,0.61,0.36,1);
+    z-index: 9999991;
+    display: flex;
+    flex-direction: column;
+  }  
+  body.storiesDrawerOpen #storiesDrawerOverlay { opacity: 1; pointer-events: auto; }
+  body.storiesDrawerOpen #storiesDrawer { transform: translateX(0); }
+  .storiesDrawerHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0.85rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .storiesDrawerSearch {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 0.65rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .storiesListCtn {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.4rem;
+  }
+  .storiesDrawerSearch input {
+    font-size: 12.5px;
+    padding: 0.35rem 0.55rem;
+    background: var(--bg-overlay);
+  }
+  .storyRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.35rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    margin: 2px 0;
+    transition: background var(--transition);
+  }
+  .storyRow:hover { background: var(--bg-hover); }
+  .storyRow.current { border-color: rgba(118,117,137,0.25); background: var(--accent-dim); }
+  .storyPickBtn {
+    flex: 1;
+    text-align: left;
+    background: transparent;
+    border: none;
+    color: inherit;
+    padding: 0.2rem 0.2rem;
+    font-size: 12.5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .storyTime {
+    font-size: 10.5px;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+  .storyMenuBtn {
+    background: transparent;
+    border: none;
+    padding: 0.2rem 0.35rem;
+    color: var(--text-dim);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .storyMenuBtn:hover { background: var(--bg-hover); color: var(--text); }
+  .storiesDrawerFooter {
+    border-top: 1px solid var(--border);
+    padding: 0.5rem 0.65rem;
+    padding-top: 0rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .storiesDrawerFooterActions {
+    display: flex;
+    gap: 0.35rem;
+  }
+  .storiesDrawerFooterActions button {
+    flex: 1;
+    justify-content: center;
+    font-size: 11.5px;
+    padding: 0.35rem 0.5rem;
+    background: transparent;
+    border-color: var(--border-mid);
+  }
+  
+  /* Story Menu */
+  .storyMenuEl {
+    position: fixed;
+    z-index: 9999993;
+    background: var(--bg-overlay);
+    border: 1px solid var(--border-mid);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+    border-radius: var(--radius);
+    padding: 0.3rem;
+    min-width: 160px;  
+    overflow: hidden;
+  }
+  .storyMenuEl button, .storyToolsMenu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 0.4rem 0.65rem;
+    font-size: 12.5px;
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+  .storyMenuEl button:hover, .storyToolsMenu button:hover {
+    background: var(--bg-hover);
+  }
+  .storyToolsDivider {
+    height: 1px;
+    border: 0;
+    background: var(--border);
+    margin: 0.25rem;
+  }
+  /* Modal System */
+  .modalOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999998;
+    display: grid;
+    place-items: center;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+  }
+  .modalBox {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    width: min(92vw, 520px);
+    max-height: 85vh;
+    overflow: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .modalBox select {
+    background: var(--bg-overlay);
+  }
+  .modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .modalCloseBtn {
+    background: transparent;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius);
+    color: var(--text-dim);
+    font-size: 1.0rem;;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+  }
+  .modalCloseBtn:hover { background: var(--bg-hover); color: var(--text); }
+  .modalSection {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 0.75rem 0.75rem;
+    position: relative;
+    margin-bottom: 0.85rem;
+  }
+  .modalSectionTitle {
+    position: absolute;
+    top: -0.5rem;
+    left: 0.65rem;
+    background: var(--bg);
+    padding: 0 0.3rem;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+  .modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+  }
+  .modalActions .btn-primary {
+    font-size: 13px;
+    padding: 0.45rem 1rem;
+  }
+  
+  /* Notepad Panel */
+  #notepadPanel {
+    position: fixed;
+    top: 0; right: 0;
+    min-width: 310px;
+    width: var(--notepad-width);
+    height: 100dvh;
+    background: var(--bg-surface);
+    border-left: 1px solid var(--border);
+    box-shadow: -4px 0 24px rgba(0,0,0,0.3);
+    transform: translateX(100%);
+    transition: transform 180ms cubic-bezier(0.22,0.61,0.36,1);
+    z-index: 9999960;
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+  .notepadHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .notepadHeader select {  
+    background: var(--bg-overlay);
+    flex: 1;
+    min-width: 0;
+  }
+  .notepadTabsRow {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  #notepadEditorEl, .notepadTabsRow select {  
+    background: var(--bg-overlay);
+  }
+  
+  /* Begin Screen */
+  #storyBeginBtn {
+    background: var(--accent-glow);
+    border-color: rgba(196,160,96,0.35);
+    color: var(--accent);
+    font-weight: 500;
+    font-size: 15px;
+    padding: 0.7rem 2rem;
+    border-radius: var(--radius-pill);
+    letter-spacing: 0.03em;
+  }
+  
+  
+  /* Story Area */
+  #storyGenerationAreaEl {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items: center;
+    width: 100%;
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    /* gap: 0.5rem; */
+  }
+  
+  #themeBtn, #storyToolsBtn{
+    font-size: 0.8rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: var(--radius-pill);
+    color: var(--text-dim);
+    background: var(--bg-surface);
+    border-color: var(--border);
+    letter-spacing: 0.01em;
+  }
+  #toggleOverviewVisibilityBtn {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: var(--radius-pill);
+    color: var(--text-dim);
+    background: var(--bg-overlay);
+    border-color: var(--border);
+    letter-spacing: 0.01em;
+  }
+  .storyToolsMenu {
+    position: absolute;
+    right: 0.5rem;
+    top: -0.5rem;
+    transform: translateY(1.25rem);
+    background: var(--bg-overlay);
+    border: 1px solid var(--box-border-color);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    border-radius: 6px;
+    padding: 0.25rem 0;
+    min-width: 210px;
+    z-index: 5;
+  }
+  
+  /* Story Actions */
+  #bottomButtonsCtn {
+    width: max-content;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 11.5px;
+  }
+  
+  #rateLastMessageBadBtn, #rateLastMessageGoodBtn {
+    font-size: 11.5px;
+    padding: 0.3rem 0.7rem;
+    color: var(--text-dim);
+    border-color: var(--border);
+    border-radius: var(--radius-pill);
+  }
+  
+  .settingsModule {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.4rem 0.65rem;
+    font-size: 12.5px;
+  }
+  
+  #autoBackupsCtn {
+    display: inline-block;   /* shrink to content */
+    background: var(--bg-surface);
+    border: 1px solid var(--border);  
+    border-radius: var(--radius);
+    padding: 1rem;
+  }
+  
+  #autoBackupsOuterEl {
+    text-align: center;      /* center the inline-block */
+  }
+  
+  /* Info Section */
+  #genInfoCtn {
+    max-width: 50%;
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+  }
+  /* ── Tab machinery (radio trick) ── */
+    .tabs input[type="radio"] { display: none; }
+   
+    .tabs {
+      width: 100%;
+      max-width: 680px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+   
+    /* Tab header row */
+    .tab-labels {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+   
+    .tab-labels label {
+      flex: 1;
+      text-align: center;
+      padding: 0 1rem;
+      height: var(--tab-h);
+      line-height: var(--tab-h);
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      transition: color 0.2s;
+      position: relative;
+      user-select: none;
+    }
+   
+    /* Sliding indicator — sits at bottom of label row */
+    .tab-labels label::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 10%;
+      width: 80%;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 2px 2px 0 0;
+      transform: scaleX(0);
+      transition: transform 0.25s ease;
+    }
+   
+    /* Active states driven by sibling-combinator off hidden radios */
+    #tab-about:checked  ~ .tab-labels label[for="tab-about"],
+    #tab-res:checked    ~ .tab-labels label[for="tab-res"],
+    #tab-log:checked    ~ .tab-labels label[for="tab-log"] {
+      color: var(--accent);
+    }
+    #tab-about:checked  ~ .tab-labels label[for="tab-about"]::after,
+    #tab-res:checked    ~ .tab-labels label[for="tab-res"]::after,
+    #tab-log:checked    ~ .tab-labels label[for="tab-log"]::after {
+      transform: scaleX(1);
+    }
+   
+    /* Tab panels */
+    .tab-panels { position: relative; }
+   
+    .tab-panel {
+      display: none;
+      padding: 1.6rem 1.8rem 2rem;
+      animation: fadeIn 0.22s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; } }
+   
+    #tab-about:checked ~ .tab-panels #panel-about,
+    #tab-res:checked   ~ .tab-panels #panel-res,
+    #tab-log:checked   ~ .tab-panels #panel-log {
+      display: block;
+    }
+   
+    /* ── Content styles ── */
+    .tab-panel p { margin-bottom: 0.9rem; }
+   
+    .tab-panel h4 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 1.4rem 0 0.7rem;
+    }
+    .tab-panel h4:first-child { margin-top: 0; }
+   
+    /* Top credit line */
+    .byline { font-size: 0.8rem; color: var(--text-dim); }
+    .byline b { color: var(--text-head); }
+   
+    /* Lists */
+    .tab-panel ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+    .tab-panel ul li {
+      padding-left: 1.1rem;
+      position: relative;
+    }
+    .tab-panel ul li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 0.7rem;
+      top: 0.05em;
+    }
+   
+    /* Nested lists */
+    .tab-panel ul ul {
+      margin-top: 0.45rem;
+      margin-left: 0.5rem;
+      gap: 0.35rem;
+    }
+    .tab-panel ul ul li::before { color: var(--text-dim); content: '–'; font-size: 0.8rem; }
+   
+    /* Key/value pill for feature list */
+    .pill {
+      display: inline-block;
+      background: rgba(233,135,33,0.12);
+      border: 1px solid rgba(233,135,33,0.25);
+      border-radius: 4px;
+      padding: 0 0.45em;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78em;
+      color: var(--accent);
+      margin-right: 0.25em;
+    }
+   
+    /* Inline code button style */
+    .inline-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3em;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 0.1em 0.55em;
+      font-size: 0.8em;
+      color: var(--text-head);
+      cursor: default;
+      vertical-align: middle;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+    }
+   
+    /* Warning accent text */
+    .warn { color: var(--warn); font-weight: 600; }
+   
+    /* Links */
+    a { color: var(--accent2); text-decoration: none; border-bottom: 1px solid rgba(43,187,0,0.3); transition: border-color 0.15s; }
+    a:hover { border-color: var(--accent2); }
+   
+    /* Changelog placeholder */
+    .changelog-empty {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-align: center;
+      padding: 2rem 0;
+    }
+  #changelogContent {
+    text-align: left;
+    max-height: 400px;
+    overflow: auto;
+  }
+  
+  #changelogContent h1,
+  #changelogContent h2,
+  #changelogContent h3,
+  #changelogContent h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 1.4rem 0 0.5rem;
+  }
+  
+  #changelogContent h2:first-child {
+    margin-top: 0;
+  }
+  
+  #changelogContent p {
+    margin-bottom: 0.4rem;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+  }
+  
+  #changelogContent ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  #changelogContent ul li {
+    padding-left: 1.1rem;
+    position: relative;
+  }
+  
+  #changelogContent ul li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 0.7rem;
+    top: 0.05em;
+  }
 </style>
-
 
 <!-- OLD Style-->
 <style>
-
-.storiesStorageWarning {
-  font-size: 75%;
-  opacity: 0.7;
-  padding: 0.5rem;
-  margin: 0.35rem 0.1rem 0.6rem;
-  border: 1px solid var(--box-border-color);
-  border-radius: 6px;
-  background: rgba(120,120,120,0.08);
-  text-align: left;
-  margin-top: auto;
-}
-
-#notepadOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 140ms ease-out;
-  z-index: 9999955;
-}
-
-body.notepadOpen #notepadPanel {
-  transform: translateX(0);
-}
-body.notepadOpen {
-  padding-right: var(--notepad-width, 320px);
-  transition: padding-right 140ms ease-out;
-}
-body.notepadOpen.notepadOverlayMode {
-  padding-right: 0;
-}
-body.notepadOpen.notepadOverlayMode #notepadOverlay {
-  opacity: 1;
-  pointer-events: auto;
-}
-body.notepadOverlayMode #notepadPanel {
-  width: min(360px, 88vw);
-}
-body.notepadOverlayMode #notepadResizeHandle {
-  display: none;
-}
-#notepadResizeHandle {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 6px;
-  height: 100%;
-  cursor: ew-resize;
-}
-
-#notepadTabsSelectEl {
-  flex: 1;
-  min-width: 0;
-}
-#notepadBibleCtn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1.0rem;
-  margin-top: 0.1rem;
-  padding: 0.1rem;
-}
-#notepadEditorCtn {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-}
-.notepadTabMenu {
-  position: absolute;
-  right: 0.5rem;
-  top: 4.2rem;
-  background: var(--bg-overlay);
-  border: 1px solid var(--box-border-color);
-  border-radius: 6px;
-  padding: 0.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  z-index: 9999975;
-}
-.notepadTabMenu button {
-  border: none;
-  background: transparent;
-  text-align: left;
-  padding: 0.25rem 0.4rem;
-  cursor: pointer;
-}
-.notepadTabMenu button:hover {
-  background: rgba(255,255,255,0.08);
-}
-.exportReminder {
-  background: rgba(255,142,41,0.12);
-  border: 1px solid rgba(255,142,41,0.35);
-  padding: 0.35rem 0.5rem;
-  border-radius: 6px;
-  margin-bottom: 0.35rem;
-}
-.exportReminder button {
-  margin-left: 0.5rem;
-  font-size: 85%;
-}
-.themeModalTitleRow {
-  display:flex;
-  align-items:center;
-  gap:0.5rem;
-}
-.themeSchemeSelectEl {
-  font-size:80%;
-}
-.themeColorModule {
-  display:flex;
-  align-items:center;
-  gap:0.35rem;
-  padding:0.2rem 0.35rem;
-  border-radius:6px;
-  background: rgba(0,0,0,0.08);
-  backdrop-filter: brightness(0.9);
-}
-.themeColorModule .modalField {
-  min-width:0;
-}
-.modalRow {
-  display:flex;
-  gap:0.35rem;
-  align-items:center;
-  margin-top:0.35rem;
-  flex-wrap:wrap;
-}
-.themeInlineRow {
-  align-items:center;
-  flex-wrap:wrap;
-}
-.modalRow:not(:first-child) {
-  margin-top:0rem;
-}
-.modalSectionRow {
-  align-items:stretch;
-  margin-top:0;
-  margin-bottom: 1rem;
-}
-.modalSectionHalf {
-  flex:1;
-  min-width:220px;
-  margin-bottom:0;
-}
-.modalRow > * {
-  min-width:0;
-}
-.modalField {
-  display:flex;
-  align-items:center;
-  gap:0.35rem;
-  font-size:85%;
-  flex:1;
-  min-width:140px;
-}
-.themeTextColorField {
-  flex:0 0 auto;
-}
-.themeAutoToggle {
-  flex:0 0 auto;
-  font-size:80%;
-  opacity:0.8;
-  white-space:nowrap;
-}
-.fontField {
-  flex:1 1 0;
-  min-width:200px;
-}
-.fontFieldInputRow {
-  display:flex;
-  align-items:center;
-  gap:0.25rem;
-  flex:1;
-}
-.fontFieldInputRow input {
-  flex:1;
-  min-width:0;
-}
-.fontHelpCtn {
-  position:relative;
-}
-.fontHelpBtn {
-  border:none;
-  background:transparent;
-  cursor:pointer;
-  font-size:90%;
-  padding:0 0.1rem;
-}
-.fontHelpTooltip {
-  position:absolute;
-  right:0;
-  top:calc(100% + 0.25rem);
-  z-index:2;
-  width:270px;
-  padding:0.35rem 0.45rem;
-  border:1px solid var(--box-border-color);
-  border-radius:6px;
-  background:var(--bg-overlay);
-  box-shadow:0 6px 18px rgba(0,0,0,0.2);
-}
-.storyStyleHelpCtn {
-  position:relative;
-}
-.storyStyleHelpBtn {
-  border:none;
-  background:transparent;
-  cursor:pointer;
-  font-size:90%;
-  padding:0 0.1rem;
-}
-.storyStyleHelpTooltip {
-  position:fixed;
-  right:50%;
-  top:50%;
-  z-index:9999;
-  width:475px;
-  font-size: 85%;
-  padding:0.35rem 0.45rem;
-  border:1px solid var(--box-border-color);
-  border-radius:6px;
-  background:var(--bg-overlay);
-  box-shadow:0 6px 18px rgba(0,0,0,0.9);
-}
-.modalField input[type="color"] {
-  width:30px;
-  height:30px;
-  padding:0;
-  border:none;
-  background:transparent;
-}
-.themeInlineRow .modalField {
-  flex:0 0 auto;
-  min-width:0;
-  max-width:max-content;
-}
-.modalField select {
-  flex:1;
-  min-width:0;
-}
-
-.modalRow select {
-  flex:1;
-  /* height: 1.75rem; */
-  box-sizing: border-box;
-}
-.modalField input:not([type="color"]):not([type="checkbox"]) {
-  flex:1;
-  min-width:0;
-}
-.themeAdvancedRow {
-  display:flex;
-  gap:0.5rem;
-  align-items:center;
-  margin-top:0.35rem;
-  flex-wrap:wrap;
-}
-.themeAdvancedRow input {
-  min-width:0;
-}
-.themeAdvancedRow textarea {
-  min-width:0;
-  resize:vertical;
-}
-.themeAdvancedRow .themePatternInput {
-  flex:1.1;
-  min-width:160px;
-}
-.themeAdvancedRow .themeCssInput {
-  flex:1.4;
-  min-width:180px;
-}
-.themeRulesHelpBtn {
-  border:none;
-  background:transparent;
-  cursor:pointer;
-  font-size:90%;
-  padding:0 0.1rem;
-  margin-left:0.35rem;
-}
-.importDropZone {
-  flex:1;
-  min-width:160px;
-  border:1px dashed var(--box-border-color);
-  border-radius:6px;
-  padding:0.45rem 0.6rem;
-  text-align:center;
-  font-size:80%;
-  opacity:0.8;
-  cursor:pointer;
-}
-.importDropZone.dragOver {
-  opacity:1;
-  background:var(--bg-overlay);
-}
-.importUrlRow {
-  flex-wrap:nowrap;
-}
-.importUrlRow input {
-  flex:1;
-  min-width:0;
-}
-.importUrlRow button {
-  flex:0 0 auto;
-  white-space:nowrap;
-}
-.exportUrlRow {
-  flex-wrap:nowrap;
-}
-.exportUrlRow input {
-  flex:1;
-  min-width:0;
-}
-.exportUrlRow button {
-  flex:0 0 auto;
-  white-space:nowrap;
-}
-.mediaInputRow {
-  align-items:stretch;
-  margin-top:0px;
-}
-.mediaEmojiInput,
-.mediaEmojiEdit {
-  width:30px;
-  flex:0 0 30px;
-  text-align:center;
-}
-.mediaTitleInput {
-  flex:0.8;
-  min-width:100px;
-}
-.mediaTitleEdit {
-  flex:1;
-  min-width:0;
-  text-align:left;
-}
-.mediaUrlRow {
-  display:flex;
-  align-items:center;
-  gap:0.25rem;
-  flex:1.6;
-  min-width:160px;
-}
-.mediaUrlInput {
-  flex:1;
-  min-width:0;
-}
-.mediaUploadBtn {
-  min-width:2rem;
-}
-.mediaListRow {
-  display:flex;
-  align-items:center;
-  gap:0.35rem;
-  margin-top:0.25rem;
-  min-width:0;
-}
-.mediaTitleEdit {
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-.mediaScopeSelect {
-  min-width:95px;
-}
-#backgroundMusicSelectEl {
-  max-width:200px;
-}
-.musicSelectRow {
-  display:flex;
-  gap:0.25rem;
-  align-items:center;
-  flex-wrap:wrap;
-}
-#backgroundAudioPlayerEl {
-  width:100%;
-  margin-top:0.35rem;
-}
-#pageMusicToggleBtn {
-  position: fixed;
-  top: 0.25rem;
-  right: 0.25rem;
-  z-index: 9999985;
-  border: 1px solid var(--box-border-color);
-  background: var(--bg-overlay);
-  border-radius: 6px;
-  font-size: 85%;
-  display: none;
-}
-@media screen and (min-width: 850px) {
-  #pageMusicToggleBtn {
-      display: block;
+  .storiesStorageWarning {
+    font-size: 75%;
+    opacity: 0.7;
+    padding: 0.5rem;
+    margin: 0.35rem 0.1rem 0.6rem;
+    border: 1px solid var(--box-border-color);
+    border-radius: 6px;
+    background: rgba(120,120,120,0.08);
+    text-align: left;
+    margin-top: auto;
   }
-}
-
-.fa, .fas, .fab, .far {
-  font-size:1.0rem;
-}
   
-.backgroundImageIsActive #mainCtn button,
-.backgroundImageIsActive #mainCtn .settingsModule {
-  box-shadow: 0px 0px 3px var(--background-image-active-box-shadow-color);
-}
-.backgroundImageIsActive #storyToolsMenu button {
-  box-shadow: none;
-}
+  #notepadOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 140ms ease-out;
+    z-index: 9999955;
+  }
+  
+  body.notepadOpen #notepadPanel {
+    transform: translateX(0);
+  }
+  body.notepadOpen {
+    padding-right: var(--notepad-width, 320px);
+    transition: padding-right 140ms ease-out;
+  }
+  body.notepadOpen.notepadOverlayMode {
+    padding-right: 0;
+  }
+  body.notepadOpen.notepadOverlayMode #notepadOverlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  body.notepadOverlayMode #notepadPanel {
+    width: min(360px, 88vw);
+  }
+  body.notepadOverlayMode #notepadResizeHandle {
+    display: none;
+  }
+  #notepadResizeHandle {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6px;
+    height: 100%;
+    cursor: ew-resize;
+  }
+  
+  #notepadTabsSelectEl {
+    flex: 1;
+    min-width: 0;
+  }
+  #notepadBibleCtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.0rem;
+    margin-top: 0.1rem;
+    padding: 0.1rem;
+  }
+  #notepadEditorCtn {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+  }
+  .notepadTabMenu {
+    position: absolute;
+    right: 0.5rem;
+    top: 4.2rem;
+    background: var(--bg-overlay);
+    border: 1px solid var(--box-border-color);
+    border-radius: 6px;
+    padding: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    z-index: 9999975;
+  }
+  .notepadTabMenu button {
+    border: none;
+    background: transparent;
+    text-align: left;
+    padding: 0.25rem 0.4rem;
+    cursor: pointer;
+  }
+  .notepadTabMenu button:hover {
+    background: rgba(255,255,255,0.08);
+  }
+  .exportReminder {
+    background: rgba(255,142,41,0.12);
+    border: 1px solid rgba(255,142,41,0.35);
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+    margin-bottom: 0.35rem;
+  }
+  .exportReminder button {
+    margin-left: 0.5rem;
+    font-size: 85%;
+  }
+  .themeModalTitleRow {
+    display:flex;
+    align-items:center;
+    gap:0.5rem;
+  }
+  .themeSchemeSelectEl {
+    font-size:80%;
+  }
+  .themeColorModule {
+    display:flex;
+    align-items:center;
+    gap:0.35rem;
+    padding:0.2rem 0.35rem;
+    border-radius:6px;
+    background: rgba(0,0,0,0.08);
+    backdrop-filter: brightness(0.9);
+  }
+  .themeColorModule .modalField {
+    min-width:0;
+  }
+  .modalRow {
+    display:flex;
+    gap:0.35rem;
+    align-items:center;
+    margin-top:0.35rem;
+    flex-wrap:wrap;
+  }
+  .themeInlineRow {
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  .modalRow:not(:first-child) {
+    margin-top:0rem;
+  }
+  .modalSectionRow {
+    align-items:stretch;
+    margin-top:0;
+    margin-bottom: 1rem;
+  }
+  .modalSectionHalf {
+    flex:1;
+    min-width:220px;
+    margin-bottom:0;
+  }
+  .modalRow > * {
+    min-width:0;
+  }
+  .modalField {
+    display:flex;
+    align-items:center;
+    gap:0.35rem;
+    font-size:85%;
+    flex:1;
+    min-width:140px;
+  }
+  .themeTextColorField {
+    flex:0 0 auto;
+  }
+  .themeAutoToggle {
+    flex:0 0 auto;
+    font-size:80%;
+    opacity:0.8;
+    white-space:nowrap;
+  }
+  .fontField {
+    flex:1 1 0;
+    min-width:200px;
+  }
+  .fontFieldInputRow {
+    display:flex;
+    align-items:center;
+    gap:0.25rem;
+    flex:1;
+  }
+  .fontFieldInputRow input {
+    flex:1;
+    min-width:0;
+  }
+  .fontHelpCtn {
+    position:relative;
+  }
+  .fontHelpBtn {
+    border:none;
+    background:transparent;
+    cursor:pointer;
+    font-size:90%;
+    padding:0 0.1rem;
+  }
+  .fontHelpTooltip {
+    position:absolute;
+    right:0;
+    top:calc(100% + 0.25rem);
+    z-index:2;
+    width:270px;
+    padding:0.35rem 0.45rem;
+    border:1px solid var(--box-border-color);
+    border-radius:6px;
+    background:var(--bg-overlay);
+    box-shadow:0 6px 18px rgba(0,0,0,0.2);
+  }
+  .storyStyleHelpCtn {
+    position:relative;
+  }
+  .storyStyleHelpBtn {
+    border:none;
+    background:transparent;
+    cursor:pointer;
+    font-size:90%;
+    padding:0 0.1rem;
+  }
+  .storyStyleHelpTooltip {
+    position:fixed;
+    right:50%;
+    top:50%;
+    z-index:9999;
+    width:475px;
+    font-size: 85%;
+    padding:0.35rem 0.45rem;
+    border:1px solid var(--box-border-color);
+    border-radius:6px;
+    background:var(--bg-overlay);
+    box-shadow:0 6px 18px rgba(0,0,0,0.9);
+  }
+  .modalField input[type="color"] {
+    width:30px;
+    height:30px;
+    padding:0;
+    border:none;
+    background:transparent;
+  }
+  .themeInlineRow .modalField {
+    flex:0 0 auto;
+    min-width:0;
+    max-width:max-content;
+  }
+  .modalField select {
+    flex:1;
+    min-width:0;
+  }
+  
+  .modalRow select {
+    flex:1;
+    /* height: 1.75rem; */
+    box-sizing: border-box;
+  }
+  .modalField input:not([type="color"]):not([type="checkbox"]) {
+    flex:1;
+    min-width:0;
+  }
+  .themeAdvancedRow {
+    display:flex;
+    gap:0.5rem;
+    align-items:center;
+    margin-top:0.35rem;
+    flex-wrap:wrap;
+  }
+  .themeAdvancedRow input {
+    min-width:0;
+  }
+  .themeAdvancedRow textarea {
+    min-width:0;
+    resize:vertical;
+  }
+  .themeAdvancedRow .themePatternInput {
+    flex:1.1;
+    min-width:160px;
+  }
+  .themeAdvancedRow .themeCssInput {
+    flex:1.4;
+    min-width:180px;
+  }
+  .themeRulesHelpBtn {
+    border:none;
+    background:transparent;
+    cursor:pointer;
+    font-size:90%;
+    padding:0 0.1rem;
+    margin-left:0.35rem;
+  }
+  .importDropZone {
+    flex:1;
+    min-width:160px;
+    border:1px dashed var(--box-border-color);
+    border-radius:6px;
+    padding:0.45rem 0.6rem;
+    text-align:center;
+    font-size:80%;
+    opacity:0.8;
+    cursor:pointer;
+  }
+  .importDropZone.dragOver {
+    opacity:1;
+    background:var(--bg-overlay);
+  }
+  .importUrlRow {
+    flex-wrap:nowrap;
+  }
+  .importUrlRow input {
+    flex:1;
+    min-width:0;
+  }
+  .importUrlRow button {
+    flex:0 0 auto;
+    white-space:nowrap;
+  }
+  .exportUrlRow {
+    flex-wrap:nowrap;
+  }
+  .exportUrlRow input {
+    flex:1;
+    min-width:0;
+  }
+  .exportUrlRow button {
+    flex:0 0 auto;
+    white-space:nowrap;
+  }
+  .mediaInputRow {
+    align-items:stretch;
+    margin-top:0px;
+  }
+  .mediaEmojiInput,
+  .mediaEmojiEdit {
+    width:30px;
+    flex:0 0 30px;
+    text-align:center;
+  }
+  .mediaTitleInput {
+    flex:0.8;
+    min-width:100px;
+  }
+  .mediaTitleEdit {
+    flex:1;
+    min-width:0;
+    text-align:left;
+  }
+  .mediaUrlRow {
+    display:flex;
+    align-items:center;
+    gap:0.25rem;
+    flex:1.6;
+    min-width:160px;
+  }
+  .mediaUrlInput {
+    flex:1;
+    min-width:0;
+  }
+  .mediaUploadBtn {
+    min-width:2rem;
+  }
+  .mediaListRow {
+    display:flex;
+    align-items:center;
+    gap:0.35rem;
+    margin-top:0.25rem;
+    min-width:0;
+  }
+  .mediaTitleEdit {
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .mediaScopeSelect {
+    min-width:95px;
+  }
+  #backgroundMusicSelectEl {
+    max-width:200px;
+  }
+  .musicSelectRow {
+    display:flex;
+    gap:0.25rem;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  #backgroundAudioPlayerEl {
+    width:100%;
+    margin-top:0.35rem;
+  }
+  #pageMusicToggleBtn {
+    position: fixed;
+    top: 0.25rem;
+    right: 0.25rem;
+    z-index: 9999985;
+    border: 1px solid var(--box-border-color);
+    background: var(--bg-overlay);
+    border-radius: 6px;
+    font-size: 85%;
+    display: none;
+  }
+  @media screen and (min-width: 850px) {
+    #pageMusicToggleBtn {
+        display: block;
+    }
+  }
+  
+  .fa, .fas, .fab, .far {
+    font-size:1.0rem;
+  }
+    
+  .backgroundImageIsActive #mainCtn button,
+  .backgroundImageIsActive #mainCtn .settingsModule {
+    box-shadow: 0px 0px 3px var(--background-image-active-box-shadow-color);
+  }
+  .backgroundImageIsActive #storyToolsMenu button {
+    box-shadow: none;
+  }
 </style>

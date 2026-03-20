@@ -5839,6 +5839,8 @@ genreInstructions
     - **Genre: Spy.** Focus on espionage, secret agents, and covert operations. The plot often involves intrigue, double-crosses, and high-stakes missions. The tone is often fast-paced and suspenseful. 
   superhero
     - **Genre: Superhero.** Focus on characters with superhuman abilities who use them to fight crime or protect the world, and villains who use their powers for evil or personal gain, sometimes for understandable or relatable reasons. Explore themes of power, responsibility, and morality. The tone is often action-packed and dramatic.
+  magic_real
+    - **Magical Realism.** Weave in subtle, unexplained magical elements that exist naturally within an otherwise realistic world. Treat the extraordinary as ordinary—characters should accept strange phenomena without question. Focus on atmosphere, emotion, and quiet wonder rather than rules or systems. Avoid structured magic or traditional fantasy tropes.
 
 styleInstructions
   default

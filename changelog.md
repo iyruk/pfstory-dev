@@ -1,3 +1,9 @@
+## 2026.03.20
+Features:
+- Added 'Magical Realism' Genre
+- UI Cleanup
+- Re-designed Info Section (Included Changelog)
+
 ## 2026.03.19
 Features:
 - Added Global Settings for Save file (by request)
