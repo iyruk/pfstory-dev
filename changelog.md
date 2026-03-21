@@ -1,4 +1,9 @@
-## 2026.03.20
+## 2026.03.20-2
+Features:
+- Added custom texteditor
+- Implemented better thought design (thoughts look like `This now`)
+
+## 2026.03.20-1
 Features:
 - Added 'Magical Realism' Genre
 - UI Cleanup
