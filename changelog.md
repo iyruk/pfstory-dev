@@ -1,3 +1,7 @@
+## 2026.03.20-4
+Fix:
+- Suggestions load fix
+
 ## 2026.03.20-3
 Features:
 - Implemented caching for a few functions for improved performance

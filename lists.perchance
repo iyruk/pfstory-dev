@@ -2470,7 +2470,8 @@ antiAntiLayoutJank(fn) => // due to browser's built-in anti-scroll-jank algorith
 generateWhatHappensNextIdeas(regen) =>
   if (codeDebug) console.log("generateWhatHappensNextIdeas");
   if(whatHappensNextSuggestionsCtn.innerHTML && !regen) {
-    generateWhatHappensNextIdeasBtn.innerHTML = icon("lightbulb","color:#ffe070;");    
+    generateWhatHappensNextIdeasBtn.innerHTML = icon("lightbulb","color:#ffe070;");
+    whatHappensNextSuggestionsCtn.style.display = "";
     generateWhatHappensNextIdeasBtn.disabled = false;
     return;
   }
