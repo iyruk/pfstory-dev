@@ -107,6 +107,11 @@
 
   window.generatingBibleSection = {}; // Object to track generation per section
   window.currentAutoBibleGeneration = [];
+  window.storyStatsCache = null;
+  window.storyStatsDirty = true;
+  window.bibleCachePrompt = null;
+  window.bibleCacheText = null;
+  window.bibleCacheDirty = true;
   window.lastBibleGenerationData = window.lastBibleGenerationData || {};
   window.currentCustomMusic = window.currentCustomMusic || [];
   window.currentCustomBackgrounds = window.currentCustomBackgrounds || [];

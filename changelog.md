@@ -1,3 +1,7 @@
+## 2026.03.20-3
+Features:
+- Implemented caching for a few functions for improved performance
+
 ## 2026.03.20-2
 Features:
 - Added custom texteditor
